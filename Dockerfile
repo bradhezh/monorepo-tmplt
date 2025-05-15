@@ -2,7 +2,7 @@ FROM node:22
 
 WORKDIR /usr/app
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@10 --activate
 
 COPY . .
 
