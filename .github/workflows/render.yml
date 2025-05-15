@@ -12,12 +12,16 @@ on:
 jobs:
   full:
     name: Full Pipeline on Render
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'pnpm'
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 10
       - run: pnpm i --frozen-lockfile
       - run: pnpm lint
       - name: Test
