@@ -1,0 +1,33 @@
+name: Render Pipeline
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches: [master]
+    # opened means created
+    types: [opened, synchronize]
+
+jobs:
+  full:
+    name: Full Pipeline on Render
+    runs-on: ubuntu-22.04.5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: pnpm i --frozen-lockfile
+      - run: pnpm lint
+      - name: Test
+        # flexible or sensitive for testing, as env vars in the pipeline
+        env:
+          DB_NAME_TEST: ${{ secrets.DB_NAME_TEST }}
+        run: pnpm test
+      - run: pnpm build
+      - name: Trigger Deployment on Render
+        # only deploy on (after) pushing (merging) to "master"
+        #if: false
+        if: ${{ github.event_name == 'push' }}
+        run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
