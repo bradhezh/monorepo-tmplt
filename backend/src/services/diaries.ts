@@ -1,0 +1,26 @@
+import {DiaryData, Diary, DiaryNonSensitive} from '../types/types'
+import diaries from '../data/diaries'
+
+const get = (): Diary[] => {
+  return diaries
+}
+
+const getNonSensitive = (): DiaryNonSensitive[] => {
+  return diaries.map(({comment: _comment, ...rest}) => rest)
+}
+
+const getById = (id: number): DiaryNonSensitive | undefined => {
+  const diary = diaries.find(e => e.id === id)
+  if (!diary) {
+    return
+  }
+  return (({comment: _comment, ...rest}) => rest)(diary)
+}
+
+const create = (data: DiaryData): Diary => {
+  const diary = {id: Math.max(...diaries.map(e => e.id)) + 1, ...data}
+  diaries.push(diary)
+  return diary
+}
+
+export default {get, getNonSensitive, getById, create}
