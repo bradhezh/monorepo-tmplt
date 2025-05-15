@@ -14,22 +14,27 @@ jobs:
     name: Full Pipeline on Render
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'pnpm'
-      - uses: pnpm/action-setup@v2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
         with:
           version: 10
-      - run: pnpm i --frozen-lockfile
-      - run: pnpm lint
+      - name: Install Dependencies
+        run: pnpm i --frozen-lockfile
+      - name: Lint
+        run: pnpm lint
       - name: Test
         # flexible or sensitive for testing, as env vars in the pipeline
         env:
           DB_NAME_TEST: ${{ secrets.DB_NAME_TEST }}
         run: pnpm test
-      - run: pnpm build
+      - name: Build
+        run: pnpm build
       - name: Trigger Deployment on Render
         # only deploy on (after) pushing (merging) to "master"
         #if: false
