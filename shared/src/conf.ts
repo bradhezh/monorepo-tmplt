@@ -1,8 +1,7 @@
-export interface Conf {
-  COMMON: string
-  ENV?: string
+const conf = {
+  ITEMS_EP: '/api/diaries',
+  BY_ID: '/id/:id',
+  BY_NAME: '/name/:name',
 }
 
-export const conf: Conf = {
-  COMMON: 'common',
-}
+export default conf

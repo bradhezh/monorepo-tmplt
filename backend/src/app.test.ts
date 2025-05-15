@@ -3,7 +3,7 @@ import assert from 'node:assert'
 import supertest from 'supertest'
 import TestAgent from 'supertest/lib/agent'
 
-import {conf} from '@backend/conf'
+import conf from '@backend/conf'
 import {app, init} from './app'
 
 let api: TestAgent

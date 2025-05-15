@@ -1,8 +1,10 @@
 import express from 'express'
 
-import {conf} from '@backend/conf'
+import conf from '@backend/conf'
 import {unknownEp, errHandler} from '@backend/utils/middleware'
 import diariesRouter from '@backend/controllers/diaries'
+
+console.log(conf)
 
 export const app = express()
 

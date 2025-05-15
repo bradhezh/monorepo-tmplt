@@ -1,15 +1,10 @@
-import type {Conf as CommonConf} from '@shared/conf'
-import {conf as commonConf} from '@shared/conf'
+import common from '@shared/conf'
 
-interface Conf extends CommonConf {
-  API_URL: string
-}
+const conf = {
+  ...common,
 
-export const conf: Conf = {
-  ...commonConf,
-  // env vars set by cli
+  // injected by Vite
   ENV: import.meta.env.MODE,
-  // env vars set by dotenv
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  API_URL: import.meta.env.VITE_API_URL,
 }
+
+export default conf

@@ -1,5 +1,5 @@
 import {app, init} from '@backend/app'
-import {conf} from '@backend/conf'
+import conf from '@backend/conf'
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 (async () => {
