@@ -1,26 +1,7 @@
 {
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "baseUrl": "..",
-    "paths": {
-      "@shared/*": ["shared/src/*"],
-      "@backend/*": ["backend/src/*"]
-    },
-    "noEmit": true,
-
-    // ES2015, with "let", "const", arrow funcs, classes, promises, modules
-    "target": "ES6",
-    "outDir": "build",
-    // cjs or mjs adopted
-    "module": "commonjs",
-    // noImplicitAny, noImplicitThis, alwaysStrict, strictBindCallApply,
-    // strictNullChecks, strictFunctionTypes, strictPropertyInitialization
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "esModuleInterop": true,
-    "resolveJsonModule": true
+    "target": "ES2022"
   },
   "include": ["src"]
   // don't include "shared" as references, which will cause it to be transpiled

@@ -1,12 +1,5 @@
-// only to help ide intellisense for "import '@shared/...'" used in "shared"
-// itself, although it won't be transpiled as a standalone one
+// won't be transpiled as a standalone one, only to help ide intellisense
 {
-  "compilerOptions": {
-    "baseUrl": "..",
-    "paths": {
-      "@shared/*": ["shared/src/*"]
-    },
-    // also for ide intellisense
-    "esModuleInterop": true
-  }
+  "extends": "../tsconfig.base.json",
+  "include": ["src"]
 }

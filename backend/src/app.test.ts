@@ -4,14 +4,13 @@ import supertest from 'supertest'
 import TestAgent from 'supertest/lib/agent'
 
 import conf from '@backend/conf'
-import {app, init} from './app'
+import app from './app'
 
 let api: TestAgent
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 describe('app', () => {
-  before(async () => {
-    await init()
+  before(() => {
     api = supertest(app)
     console.log('Before tests.')
   })
