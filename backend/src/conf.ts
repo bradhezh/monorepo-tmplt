@@ -23,7 +23,7 @@ const conf = {
   DB_NAME_TEST: process.env.DB_NAME_TEST,
 
   VER_EP: '/version',
-  VERSION: 1,
+  VERSION: 0,
 }
 
 export default conf
