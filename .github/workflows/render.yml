@@ -36,7 +36,7 @@ jobs:
       - name: Build
         run: pnpm build
       - name: Trigger Deployment on Render
-        # only deploy on (after) pushing (merging) to "master"
         #if: false
+        # only deploy on (after) pushing (merging) to "master"
         if: ${{ github.event_name == 'push' }}
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
