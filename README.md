@@ -45,4 +45,4 @@ function LoginPage() {
 
 ---
 ## Full API Documentation
-[View Documentation →](https://bradhezh.github.io/jslib-controllers-doc/)
+[View Documentation →](https://bradhezh.github.io/monorepo-doc/)
