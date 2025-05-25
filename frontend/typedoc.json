@@ -9,7 +9,7 @@
     "**/vite-env.d.ts",
     "**/*.test.*"
   ],
-  "out": "../docs/doc/frontend",
+  "out": "../docs/docs/frontend",
   "customCss": "../doc.css",
   "customJs": "../doc.js"
 }
