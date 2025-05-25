@@ -6,7 +6,7 @@
   "exclude": [
     "**/*.test.*"
   ],
-  "out": "../docs/docs/shared",
+  "out": "../docs/shared",
   "customCss": "../doc.css",
   "customJs": "../doc.js"
 }
