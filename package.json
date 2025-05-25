@@ -1,18 +1,19 @@
 {
   "name": "monorepo",
   "version": "1.0.0",
-  "description": "",
-  "scripts": {
-    "dev:frontend": "pnpm --filter frontend run dev",
-    "dev:backend": "pnpm --filter backend run dev",
-    "copy-dist": "pnpm dlx rimraf backend/dist && pnpm dlx cpx \"frontend/dist/**/*\" backend/dist",
-    "build": "pnpm -r run build && pnpm run copy-dist",
-    "start": "pnpm --filter backend run start",
-    "lint": "pnpm -r run lint",
-    "test": "pnpm -r run test"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "description": "",
+  "scripts": {
+    "copy-dist": "pnpm dlx rimraf backend/dist && pnpm dlx cpx \"frontend/dist/**/*\" backend/dist",
+    "build": "pnpm -r run build && pnpm run copy-dist",
+    "start": "pnpm --filter backend run start",
+    "dev:frontend": "pnpm --filter frontend run dev",
+    "dev:backend": "pnpm --filter backend run dev",
+    "test": "pnpm -r run test",
+    "lint": "pnpm -r run lint",
+    "docs": "pnpm -r run docs && pnpm dlx marked doc.md > docs/index.html"
+  },
   "packageManager": "pnpm@10.10.0"
 }

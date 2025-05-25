@@ -13,6 +13,9 @@ jobs:
   full:
     name: Full Pipeline on Render
     runs-on: ubuntu-latest
+    # permissions needed to deploy docs
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,3 +43,13 @@ jobs:
         # only deploy on (after) pushing (merging) to "master"
         if: ${{ github.event_name == 'push' }}
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
+      - name: Generate Documentation
+        run: pnpm run docs
+      - name: Deploy Documentation to the Public Repository
+        if: ${{ github.event_name == 'push' }}
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          personal_token: ${{ secrets.PERSONAL_TOKEN }}
+          publish_dir: ./docs
+          external_repository: bradhezh/monorepo-doc
+          publish_branch: main

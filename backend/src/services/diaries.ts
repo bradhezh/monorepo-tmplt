@@ -1,5 +1,6 @@
-import {DiaryData, Diary, DiaryNonSensitive} from '../types/types'
-import diaries from '../data/diaries'
+import {
+  diaries, DiaryData, Diary, DiaryNonSensitive,
+} from '@backend/data/diaries'
 
 const get = (): Diary[] => {
   return diaries

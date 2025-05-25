@@ -1,7 +1,26 @@
+import {z} from 'zod'
+
+export enum Weather {
+  Sunny = 'sunny',
+  Rainy = 'rainy',
+  Cloudy = 'cloudy',
+  Windy = 'windy',
+  Stormy = 'stormy',
+}
+
+export const DiarySchema = z.object({
+  date: z.string().date(),
+  weather: z.nativeEnum(Weather),
+  comment: z.string().optional(),
+})
+// ts types can be inferred from schemas
+export type DiaryData = z.infer<typeof DiarySchema>
+export interface Diary extends DiaryData {
+  id: number
+}
+export type DiaryNonSensitive = Omit<Diary, 'comment'>
+
 /* eslint-disable quotes */
-
-import {DiarySchema, Diary} from "../types/types"
-
 const data = [{
   "id": 1,
   "date": "2017-01-01",
@@ -27,9 +46,8 @@ const data = [{
   "visibility": "good",
   "comment": "I almost failed the landing but I survived"
 }]
+/* eslint-enable quotes */
 
-const diaries: Diary[] = data.map(e => {
+export const diaries: Diary[] = data.map((e) => {
   return {id: e.id, ...DiarySchema.parse(e)}
 })
-
-export default diaries

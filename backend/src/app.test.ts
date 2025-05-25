@@ -3,24 +3,22 @@ import assert from 'node:assert'
 import supertest from 'supertest'
 import TestAgent from 'supertest/lib/agent'
 
+import {HTTP_STATUS} from '@backend/const'
 import conf from '@backend/conf'
 import app from './app'
 
 let api: TestAgent
 
-// eslint-disable-next-line @typescript-eslint/no-floating-promises
-describe('app', () => {
+void describe('app', () => {
   before(() => {
     api = supertest(app)
     console.log('Before tests.')
   })
 
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  describe('version', () => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    test('get', async () => {
+  void describe('version', () => {
+    void test('get', async () => {
       const res = await api.get(conf.VER_EP)
-        .expect(200).expect('Content-Type', /application\/json/)
+        .expect(HTTP_STATUS.OK).expect('Content-Type', /application\/json/)
       assert.strictEqual(res.body, conf.VERSION)
     })
   })

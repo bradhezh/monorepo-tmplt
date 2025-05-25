@@ -1,0 +1,12 @@
+body {
+  font-family: "Lucida Grande";
+}
+
+code, pre {
+  font-family: "Monaco";
+}
+
+.tsd-signature {
+  font-family: "Monaco";
+  line-height: 180%;
+}

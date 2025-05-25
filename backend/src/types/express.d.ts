@@ -1,4 +1,4 @@
-import {DiaryData} from './types'
+import {DiaryData} from '@backend/data/diaries'
 
 declare global {
   namespace Express {
