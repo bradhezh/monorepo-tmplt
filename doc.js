@@ -2,7 +2,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const nav = document.querySelector('.tsd-toolbar-contents')
   if (nav) {
     const paths = location.pathname.split('/')
-    const i = paths.lastIndexOf('docs')
+    const i = paths.lastIndexOf('doc')
     const depth = paths.length - i - 2
     const up = Array(depth).fill('..').join('/') || '.'
     const link = document.createElement('a')

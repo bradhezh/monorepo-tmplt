@@ -9,7 +9,7 @@
     "**/express.d.ts",
     "**/*.test.*"
   ],
-  "out": "../docs/backend",
+  "out": "../docs/doc/backend",
   "customCss": "../doc.css",
   "customJs": "../doc.js"
 }
