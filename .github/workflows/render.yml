@@ -13,7 +13,7 @@ jobs:
   full:
     name: Full Pipeline on Render
     runs-on: ubuntu-latest
-    # permissions needed to deploy docs
+    # permissions needed to publish docs
     permissions:
       contents: write
     steps:
@@ -45,7 +45,7 @@ jobs:
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
       - name: Generate Documentation
         run: pnpm run docs
-      - name: Deploy Documentation to the Public Repository
+      - name: Publish Documentation to the Public Repository
         if: ${{ github.event_name == 'push' }}
         uses: peaceiris/actions-gh-pages@v4
         with:

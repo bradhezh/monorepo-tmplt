@@ -1,12 +1,12 @@
 body {
-  font-family: "Lucida Grande";
+  font-family: 'Lucida Grande', sans-serif;
 }
 
 code, pre {
-  font-family: "Monaco";
+  font-family: Monaco, monospace;
 }
 
 .tsd-signature {
-  font-family: "Monaco";
+  font-family: Monaco, monospace;
   line-height: 180%;
 }

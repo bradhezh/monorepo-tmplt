@@ -16,8 +16,21 @@ docs
 # .env might include sensitive confs
 .env
 
-.dockerignore
+.git
+.github
 .gitignore
+CODEOWNERS
+
+*eslint*
+
+*.test.*
+
+jsdoc.json
+typedoc.json
+*.md
+doc.*
+
+.dockerignore
 Dockerfile
 
 # Editor directories and files
