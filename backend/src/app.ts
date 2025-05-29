@@ -5,10 +5,10 @@ import conf from '@backend/conf'
 import {reqLogger, unknownEp, errHandler} from '@backend/utils/middleware'
 import diariesRouter from '@backend/controllers/diaries'
 
-const app = express()
+export const app = express()
 
 // middleware mounted by app.<method>(...) is called (valid) only if requests
-// match the method and path (route) exactly (only with minor tolerance like
+// match the method and path (route) exactly (only with minor tolerance like the
 // trailing slash), while app.use(...) adopts prefix-based matching and the
 // matched prefix will be stripped from req.url before it's passed to the
 // middleware, so a router should exclude the matched prefix from its own routes

@@ -8,17 +8,21 @@ dotenv.config()
 const conf = {
   ...common,
 
-  /** Set it in the CLI. */
+  /** Should be set in the CLI. */
   NODE_ENV: process.env.NODE_ENV!,
 
-  /** Included in .env; set it in the cloud; don't set it in CICD pipelines. */
+  /** Flexible or sensitive configuration included in .env: should be set in the
+    cloud but unnecessary in CICD pipelines. */
   SECRET: process.env.SECRET || 'alskjfeoicvinef',
-  /** Included in .env; don't set it in the cloud, because it will be
-    automatically set by cloud platforms; don't set it in CICD pipelines. */
+  /** Flexible or sensitive configuration included in .env: normally will be
+    automatically set by cloud platforms, so unnecessary to be set in both the
+    cloud and CICD pipelines. */
   PORT: Number(process.env.PORT) || 3000,
-  /** Included in .env; set it in the cloud; don't set it in CICD pipelines. */
+  /** Flexible or sensitive configuration included in .env: should be set in the
+    cloud but unnecessary in CICD pipelines. */
   DB_NAME: process.env.DB_NAME,
-  /** Included in .env; don't set it in the cloud; set it in CICD pipelines. */
+  /** Flexible or sensitive configuration included in .env: should be set in
+    CICD pipelines but not in the cloud. */
   DB_NAME_TEST: process.env.DB_NAME_TEST,
 
   VER_EP: '/version',
@@ -35,5 +39,6 @@ const conf = {
   don't need to be defined in the cloud for production deployment. */
 export default {
   ...conf,
+
   SPA: `${conf.DIST_DIR}/index.html`,
 } as const

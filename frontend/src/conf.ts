@@ -5,6 +5,6 @@ const conf = {
 
   // injected by Vite
   ENV: import.meta.env,
-}
+} as const
 
 export default conf

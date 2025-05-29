@@ -2,15 +2,15 @@ import {
   diaries, DiaryData, Diary, DiaryNonSensitive,
 } from '@backend/data/diaries'
 
-const get = (): Diary[] => {
+export const get = (): Diary[] => {
   return diaries
 }
 
-const getNonSensitive = (): DiaryNonSensitive[] => {
+export const getNonSensitive = (): DiaryNonSensitive[] => {
   return diaries.map(({comment: _comment, ...rest}) => rest)
 }
 
-const getById = (id: number): DiaryNonSensitive | undefined => {
+export const getById = (id: number): DiaryNonSensitive | undefined => {
   const diary = diaries.find(e => e.id === id)
   if (!diary) {
     return
@@ -18,7 +18,7 @@ const getById = (id: number): DiaryNonSensitive | undefined => {
   return (({comment: _comment, ...rest}) => rest)(diary)
 }
 
-const create = (data: DiaryData): Diary => {
+export const create = (data: DiaryData): Diary => {
   const diary = {id: Math.max(...diaries.map(e => e.id)) + 1, ...data}
   diaries.push(diary)
   return diary

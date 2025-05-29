@@ -1,14 +1,25 @@
 import {Request, Response, NextFunction} from 'express'
 import {z} from 'zod'
 import path from 'path'
+import {format} from 'util'
 
 import {ENV} from '@shared/const'
-import {HTTP_STATUS, MESSAGE} from '@backend/const'
+import {HTTP_STATUS, HttpStatus, ERROR, MESSAGE} from '@backend/const'
 import conf from '@backend/conf'
 import log from '@backend/utils/log'
-import {MiddlewareErr} from '@backend/utils/error'
 import {DiarySchema} from '@backend/data/diaries'
 
+export class MiddlewareErr extends Error {
+  name = ERROR.MIDDLEWARE
+
+  /** @param messages
+    Format sequences like "%s", "%d" can be used in messages. */
+  constructor(public status: HttpStatus, ...messages: unknown[]) {
+    super(format(...messages))
+  }
+}
+
+/** Log requests before they're handled, only for "debug" and development. */
 export const reqLogger = (req: Request, _res: Response, next: NextFunction) => {
   log.debug(req.method, req.path)
   if (conf.NODE_ENV === ENV.DEV) {
@@ -38,8 +49,8 @@ export const errHandler = (
   log.error(err.name, err.message)
 
   if (err instanceof z.ZodError) {
-    // causing frontend axios to throw an "error" including the object from json
-    // as error.response.data
+    // causing frontend axios to throw "error" including the object from json as
+    // error.response.data
     return res.status(HTTP_STATUS.BAD_REQ).json({message: err.message})
   }
 
@@ -47,15 +58,17 @@ export const errHandler = (
     return res.status(err.status).json({message: err.message})
   }
 
+  // pass to the default one
   next(err)
 }
 
-// validators
+/** Validate req.body as type DiaryData. req.validatedBody will be the validated
+  one. */
 export const diaryParser = (
   req: Request, _res: Response, next: NextFunction,
 ) => {
 
-  // validation based on zod schemas, still throws errors when failing
+  // based on zod schemas, still throwing errors when failing
   req.validatedBody = DiarySchema.parse(req.body)
   next()
 }
