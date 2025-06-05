@@ -1,6 +1,4 @@
-import {
-  diaries, DiaryData, Diary, DiaryNonSensitive,
-} from '@backend/data/diaries'
+import {diaries, DiaryData, Diary, DiaryNonSensitive} from '@/data/diaries'
 
 export const get = (): Diary[] => {
   return diaries

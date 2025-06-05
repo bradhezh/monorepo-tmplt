@@ -1,5 +1,5 @@
 import {ENV} from '@shared/const'
-import conf from '@backend/conf'
+import conf from '@/conf'
 
 /** No effect for "test".
   @param params - Format sequences like "%s", "%d" can be used in params. */

@@ -1,11 +1,10 @@
 import {default as express, Response} from 'express'
 
-import {HTTP_STATUS} from '@backend/const'
-import conf from '@backend/conf'
-import {MiddlewareErr} from '@backend/utils/middleware'
-import {Diary, DiaryNonSensitive} from '@backend/data/diaries'
-import {diaryParser} from '@backend/utils/middleware'
-import diaries from '@backend/services/diaries'
+import {HTTP_STATUS} from '@/const'
+import conf from '@/conf'
+import {MiddlewareErr, diaryParser} from '@/utils/middleware'
+import {Diary, DiaryNonSensitive} from '@/data/diaries'
+import diaries from '@/services/diaries'
 
 export const router = express.Router()
 

@@ -1,12 +1,34 @@
 {
-  "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "ES2020",
+    "useDefineForClassFields": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "esModuleInterop": false,
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
     "jsx": "react-jsx",
-    "erasableSyntaxOnly": true
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+
+    // added
+    "baseUrl": "..",
+    "paths": {
+      "@/*": ["frontend/src/*"],
+      "@shared/*": ["shared/src/*"]
+    }
   },
   "include": ["src"]
 }

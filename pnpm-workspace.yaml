@@ -3,4 +3,5 @@ packages:
   - frontend
   - backend
 onlyBuiltDependencies:
+  - '@swc/core'
   - esbuild

@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc -b && vite build",
     "dev": "vite",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "preview": "vite preview",
     "lint": "eslint .",
     "docs": "typedoc"

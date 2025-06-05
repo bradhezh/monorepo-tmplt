@@ -1,7 +1,28 @@
 {
-  "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2022"
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+
+    "baseUrl": "..",
+    "paths": {
+      "@/*": ["backend/src/*"],
+      "@shared/*": ["shared/src/*"]
+    }
   },
   "include": ["src"]
   // don't include "shared" as references, which will cause it to be transpiled

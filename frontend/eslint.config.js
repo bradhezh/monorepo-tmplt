@@ -10,12 +10,7 @@ export default tseslint.config({
   extends: [js.configs.recommended, ...tseslint.configs.recommendedTypeChecked],
   files: ['**/*.{ts,tsx}'],
   languageOptions: {
-    ecmaVersion: 2020,
-    globals: {
-      ...globals.browser,
-      // vitest globals
-      vi: true, test: true, describe: true, expect: true,
-    },
+    ecmaVersion: 2020, globals: globals.browser,
     parserOptions: {
       project: ['tsconfig.node.json', 'tsconfig.app.json'],
       tsconfigRootDir: import.meta.dirname,

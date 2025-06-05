@@ -1,7 +1,7 @@
 import {StrictMode} from 'react'
 import {createRoot} from 'react-dom/client'
 
-import Main from '@frontend/components/Main'
+import Main from '@/components/Main'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -46,6 +46,7 @@ jobs:
       - name: Generate Documentation
         run: pnpm run docs
       - name: Publish Documentation to the Public Repository
+        #if: false
         if: ${{ github.event_name == 'push' }}
         uses: peaceiris/actions-gh-pages@v4
         with:

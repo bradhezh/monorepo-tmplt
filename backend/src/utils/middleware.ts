@@ -4,10 +4,10 @@ import path from 'path'
 import {format} from 'util'
 
 import {ENV} from '@shared/const'
-import {HTTP_STATUS, HttpStatus, ERROR, MESSAGE} from '@backend/const'
-import conf from '@backend/conf'
-import log from '@backend/utils/log'
-import {DiarySchema} from '@backend/data/diaries'
+import {HTTP_STATUS, HttpStatus, ERROR, MESSAGE} from '@/const'
+import conf from '@/conf'
+import log from '@/utils/log'
+import {DiarySchema} from '@/data/diaries'
 
 export class MiddlewareErr extends Error {
   name = ERROR.MIDDLEWARE

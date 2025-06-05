@@ -1,29 +1,28 @@
-import {describe, test, before, after} from 'node:test'
-import assert from 'node:assert'
 import supertest from 'supertest'
 import TestAgent from 'supertest/lib/agent'
 
-import {HTTP_STATUS} from '@backend/const'
-import conf from '@backend/conf'
-import app from './app'
+import {HTTP_STATUS} from '@/const'
+import conf from '@/conf'
+import {app, init} from './app'
 
 let api: TestAgent
 
-void describe('app', () => {
-  before(() => {
+describe('app', () => {
+  beforeAll(async () => {
+    await init()
     api = supertest(app)
     console.log('Before tests.')
   })
 
-  void describe('version', () => {
-    void test('get', async () => {
+  describe('version', () => {
+    it('get', async () => {
       const res = await api.get(conf.VER_EP)
         .expect(HTTP_STATUS.OK).expect('Content-Type', /application\/json/)
-      assert.strictEqual(res.body, conf.VERSION)
+      expect(res.body).toEqual(conf.VERSION)
     })
   })
 
-  after(() => {
+  afterAll(() => {
     console.log('After tests.')
   })
 })

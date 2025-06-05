@@ -1,5 +1,4 @@
 // won't be transpiled as a standalone one, only to help ide intellisense
 {
-  "extends": "../tsconfig.base.json",
-  "include": ["src"]
+  "extends": "../backend/tsconfig.json"
 }
