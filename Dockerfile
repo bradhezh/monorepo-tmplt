@@ -12,4 +12,4 @@ RUN pnpm i --frozen-lockfile --prod
 
 USER node
 
-CMD ["pnpm", "start"]
+CMD ["pnpm", "start:debug"]
