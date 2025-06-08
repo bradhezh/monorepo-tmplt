@@ -26,7 +26,6 @@ const conf = {
   /** Flexible or sensitive configuration included in .env: should be set in
     CICD pipelines but not in the cloud. */
   DB_URL_TEST: process.env.DB_URL_TEST!,
-  LOG_URL_TEST: process.env.LOG_URL_TEST!,
 
   SALT: Number(process.env.SALT) || 5,
   INI_ADMIN: process.env.INI_ADMIN || 'admin',

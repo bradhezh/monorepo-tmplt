@@ -34,7 +34,7 @@ jobs:
       - name: Test
         # flexible or sensitive for testing, as env vars in the pipeline
         env:
-          DB_NAME_TEST: ${{ secrets.DB_NAME_TEST }}
+          DB_URL_TEST: ${{ secrets.DB_URL_TEST }}
         run: pnpm test
       - name: Build
         run: pnpm build
