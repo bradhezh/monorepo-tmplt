@@ -6,6 +6,7 @@
   "license": "ISC",
   "description": "",
   "scripts": {
+    "migrations": "pnpm --filter backend run migrations:all",
     "copy-dist": "pnpm dlx rimraf backend/dist && pnpm dlx cpx \"frontend/dist/**/*\" backend/dist",
     "build": "pnpm -r run build && pnpm run copy-dist",
     "start": "pnpm --filter backend run start",
