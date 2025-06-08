@@ -21,15 +21,15 @@ export class MiddlewareErr extends Error {
 
 /** Log requests before they're handled, only for "debug" and development. */
 export const reqLogger = (req: Request, _res: Response, next: NextFunction) => {
-  log.debug(req.method, req.path)
+  log.debug(req.method, req.path).catch(console.log)
   if (conf.NODE_ENV === ENV.DEV) {
-    log.debug(req.body)
+    log.debug(req.body).catch(console.log)
   }
   next()
 }
 
 export const unknownEp = (_req: Request, res: Response, next: NextFunction) => {
-  log.debug(MESSAGE.UNKNOWN_EP)
+  log.debug(MESSAGE.UNKNOWN_EP).catch(console.log)
   if (!conf.SPA) {
     throw new MiddlewareErr(HTTP_STATUS.NOT_FOUND, MESSAGE.UNKNOWN_EP)
   }
@@ -46,7 +46,7 @@ export const errHandler = (
   if (!(err instanceof Error)) {
     throw new Error(MESSAGE.UNKNOWN)
   }
-  log.error(err.name, err.message)
+  log.error(err.name, err.message).catch(console.log)
 
   if (err instanceof z.ZodError) {
     // causing frontend axios to throw "error" including the object from json as

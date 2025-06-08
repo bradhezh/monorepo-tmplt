@@ -1,4 +1,5 @@
 import dotenv from 'dotenv'
+import bcrypt from 'bcrypt'
 
 import common from '@shared/conf'
 
@@ -20,10 +21,16 @@ const conf = {
   PORT: Number(process.env.PORT) || 3000,
   /** Flexible or sensitive configuration included in .env: should be set in the
     cloud but unnecessary in CICD pipelines. */
-  DB_NAME: process.env.DB_NAME,
+  DB_URL: process.env.DB_URL!,
+  LOG_URL: process.env.LOG_URL!,
   /** Flexible or sensitive configuration included in .env: should be set in
     CICD pipelines but not in the cloud. */
-  DB_NAME_TEST: process.env.DB_NAME_TEST,
+  DB_URL_TEST: process.env.DB_URL_TEST!,
+  LOG_URL_TEST: process.env.LOG_URL_TEST!,
+
+  SALT: Number(process.env.SALT) || 5,
+  INI_ADMIN: process.env.INI_ADMIN || 'admin',
+  INI_ADMIN_PASSWD: process.env.INI_ADMIN_PASSWD || '888888',
 
   VER_EP: '/version',
   VERSION: 0,
@@ -41,4 +48,9 @@ export default {
   ...conf,
 
   SPA: `${conf.DIST_DIR}/index.html`,
+
+  async cryptAdminPasswd() {
+    (this as any).INI_ADMIN_PASSWD =
+      await bcrypt.hash(this.INI_ADMIN_PASSWD, this.SALT)
+  }
 } as const

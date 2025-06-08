@@ -1,13 +1,29 @@
 import express from 'express'
 import 'express-async-errors'
+import {MikroORM, EntityManager} from '@mikro-orm/core'
 
+import {ENV} from '@shared/const'
 import conf from '@/conf'
+import log from '@/utils/log'
+import confDb from '@/models/mikro-orm.config'
+import confLog from '@/models/log/mikro-orm.config'
 import {reqLogger, unknownEp, errHandler} from '@/utils/middleware'
 import diariesRouter from '@/controllers/diaries'
+
+export const DI: Partial<{
+  db: MikroORM, dbLog: MikroORM, em: EntityManager,
+}> = {}
 
 export const app = express()
 
 export const init = async () => {
+  DI.db = await MikroORM.init(confDb)
+  DI.em = DI.db.em
+  if (conf.NODE_ENV === ENV.DBG) {
+    DI.dbLog = await MikroORM.init(confLog)
+    log.init({em: DI.dbLog.em})
+  }
+
   // middleware mounted by app.<method>(...) is called (valid) only if requests
   // match the method and path (route) exactly (only with minor tolerance like
   // the trailing slash), while app.use(...) adopts prefix-based matching and
@@ -31,8 +47,6 @@ export const init = async () => {
   app.get(conf.VER_EP, (_req, res) => {
     res.json(conf.VERSION)
   })
-
-  await new Promise<void>((resolve) => setTimeout(resolve, 1000))
 
   app.use(conf.ITEMS_EP, diariesRouter)
   app.use(unknownEp)

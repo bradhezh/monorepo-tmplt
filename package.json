@@ -9,6 +9,7 @@
     "copy-dist": "pnpm dlx rimraf backend/dist && pnpm dlx cpx \"frontend/dist/**/*\" backend/dist",
     "build": "pnpm -r run build && pnpm run copy-dist",
     "start": "pnpm --filter backend run start",
+    "start:debug": "pnpm --filter backend run start:debug",
     "dev:frontend": "pnpm --filter frontend run dev",
     "dev:backend": "pnpm --filter backend run dev",
     "test": "pnpm -r run test",

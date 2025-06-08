@@ -20,7 +20,6 @@ export interface Diary extends DiaryData {
 }
 export type DiaryNonSensitive = Omit<Diary, 'comment'>
 
-/* eslint-disable quotes */
 const data = [{
   "id": 1,
   "date": "2017-01-01",
@@ -42,7 +41,6 @@ const data = [{
   "weather": "cloudy",
   "comment": "I almost failed the landing but I survived"
 }]
-/* eslint-enable quotes */
 
 export const diaries: Diary[] = data.map((e) => {
   return {id: e.id, ...DiarySchema.parse(e)}
