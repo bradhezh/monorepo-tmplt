@@ -5,7 +5,6 @@ import {ENV} from '@shared/const'
 import conf from '@/conf'
 import {User, Item} from '@/models/entities'
 
-console.log(conf)
 export default defineConfig({
   clientUrl: conf.NODE_ENV === ENV.TEST ? conf.DB_URL_TEST : conf.DB_URL,
   entities: [User, Item],

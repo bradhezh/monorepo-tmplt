@@ -6,16 +6,16 @@
   "license": "ISC",
   "description": "",
   "scripts": {
+    "migrations": "pnpm --filter backend migrations",
     "copy-dist": "pnpm dlx rimraf backend/dist && pnpm dlx cpx \"frontend/dist/**/*\" backend/dist",
-    "build": "pnpm -r run build && pnpm run copy-dist",
-    "build:cicd": "pnpm --filter frontend run build && pnpm --filter backend run build:cicd && pnpm run copy-dist",
-    "start": "pnpm --filter backend run start",
-    "start:debug": "pnpm --filter backend run start:debug",
-    "dev:frontend": "pnpm --filter frontend run dev",
-    "dev:backend": "pnpm --filter backend run dev",
-    "test": "pnpm -r run test",
-    "lint": "pnpm -r run lint",
-    "docs": "pnpm dlx rimraf docs && pnpm -r run docs && pnpm dlx cpx \"doc.{html,css}\" docs && pnpm dlx renamer --find \"doc\" --replace \"index\" docs/doc.html"
+    "build": "pnpm -r build && pnpm copy-dist",
+    "start": "pnpm --filter backend start",
+    "start:debug": "pnpm --filter backend start:debug",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:backend": "pnpm --filter backend dev",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "docs": "pnpm dlx rimraf docs && pnpm -r docs && pnpm dlx cpx \"doc.{html,css}\" docs && pnpm dlx renamer --find \"doc\" --replace \"index\" docs/doc.html"
   },
   "packageManager": "pnpm@10.10.0"
 }
