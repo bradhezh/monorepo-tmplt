@@ -20,10 +20,10 @@ const conf = {
     cloud and CICD pipelines. */
   PORT: Number(process.env.PORT) || 3000,
   /** Flexible or sensitive configuration included in .env: should be set in the
-    cloud, as well as in CICD pipelines due to being used in build. */
+    cloud but unnecessary in CICD pipelines. */
   DB_URL: process.env.DB_URL!,
   /** Flexible or sensitive configuration included in .env: should be set in the
-    cloud, as well as in CICD pipelines due to being used in build. */
+    cloud but unnecessary in CICD pipelines. */
   LOG_URL: process.env.LOG_URL!,
   /** Flexible or sensitive configuration included in .env: should be set in
     CICD pipelines but not in the cloud. */

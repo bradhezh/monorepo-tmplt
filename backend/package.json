@@ -10,6 +10,7 @@
     "migrate:test": "NODE_ENV=test mikro-orm migration:up --config src/models/mikro-orm.config.ts",
     "migrate:log": "mikro-orm migration:up --config src/models/log/mikro-orm.config.ts",
     "build": "tsc && tsup src/index.ts --out-dir build && pnpm migrations && pnpm migrations:log",
+    "build:cicd": "tsc && tsup src/index.ts --out-dir build",
     "start": "pnpm migrate && NODE_ENV=production node build/index.js",
     "start:debug": "pnpm migrate && pnpm migrate:log && NODE_ENV=debug node build/index.js",
     "dev": "pnpm migrations && pnpm migrate && NODE_ENV=development ts-node-dev --respawn --files -r tsconfig-paths/register src/index.ts",
