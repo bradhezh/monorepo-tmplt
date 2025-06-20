@@ -15,10 +15,6 @@ export default defineConfig({
   },
   debug: conf.NODE_ENV === ENV.DBG || conf.NODE_ENV === ENV.DEV ? true : false,
   /*
-  driverOptions: {
-    connection: {
-      ssl: {rejectUnauthorized: true}
-    }
-  }
+  driverOptions: {connection: {ssl: {rejectUnauthorized: true}}},
   */
 })

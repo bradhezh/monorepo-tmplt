@@ -15,6 +15,8 @@ export const ERROR = {
 } as const
 
 export const MESSAGE = {
-  UNKNOWN: 'Unknown error.',
+  APP_STARTED: 'Server running on port %d.',
+  EM_UNINITED: 'Entity manager not initialised.',
   UNKNOWN_EP: 'Unknown endpoint.',
+  UNKNOWN: 'Unknown error.',
 } as const

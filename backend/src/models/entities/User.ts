@@ -11,9 +11,16 @@ export class User extends Base {
   @Property({nullable: true})
   name?: string
 
-  @Property({lazy: true, hidden: true})
-  password? = ''
+  @Property({nullable: true})
+  email?: string
 
+  @Property({
+    lazy: true,
+    hidden: true,
+  })
+  password!: string
+
+  // inverse side (mapped by)
   @OneToMany(() => Item, item => item.user)
   items = new Collection<Item>(this)
 }

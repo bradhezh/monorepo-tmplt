@@ -15,11 +15,15 @@ export default defineConfig({
   server: {
     // for the development server to forward restful requests to the backend
     proxy: {
-      '/api': {target: 'http://localhost:3001', changeOrigin: true},
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
     },
   },
   test: {
-    environment: 'jsdom', setupFiles: 'src/setupTests.ts',
+    environment: 'jsdom',
+    setupFiles: 'src/setupTests.ts',
     // making test funcs such as test, describe, and expect global for js
     globals: true,
   },

@@ -1,4 +1,4 @@
-export const Main = (): React.JSX.Element => {
+export const Main = () => {
   return (
     <div>
       <h1>Vite + React + TS</h1>

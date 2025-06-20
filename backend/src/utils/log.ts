@@ -1,11 +1,11 @@
-import util from 'util'
+import {format} from 'util'
 import {EntityManager} from '@mikro-orm/core'
 
 import {ENV} from '@shared/const'
 import conf from '@/conf'
 import {Log} from '@/models/log/entities'
 
-const DI: Partial<{em: EntityManager}> = {}
+const DI: {em?: EntityManager} = {}
 
 export const init = ({em}: {em: EntityManager}) => {
   DI.em = em
@@ -17,14 +17,17 @@ export const info = async (...params: unknown[]) => {
   if (conf.NODE_ENV === ENV.TEST) {
     return
   }
-  console.log(new Date(), ':', ...params)
+  console.log(new Date(), ':', format(...params))
 
   if (conf.NODE_ENV !== ENV.DBG || !DI.em) {
     return
   }
   // write to the db
   const em = DI.em.fork()
-  em.create(Log, {type: 'info', message: util.format(...params)})
+  em.create(Log, {
+    type: 'info',
+    message: format(...params),
+  })
   await em.flush()
 }
 
@@ -34,27 +37,33 @@ export const debug = async (...params: unknown[]) => {
   if (conf.NODE_ENV !== ENV.DBG && conf.NODE_ENV !== ENV.DEV) {
     return
   }
-  console.log(new Date(), ':', ...params)
+  console.log(new Date(), ':', format(...params))
 
   if (conf.NODE_ENV !== ENV.DBG || !DI.em) {
     return
   }
   // write to the db
   const em = DI.em.fork()
-  em.create(Log, {type: 'debug', message: util.format(...params)})
+  em.create(Log, {
+    type: 'debug',
+    message: format(...params),
+  })
   await em.flush()
 }
 
 /** @param params - Format sequences like "%s", "%d" can be used in params. */
 export const error = async (...params: unknown[]) => {
-  console.error(new Date(), ':', 'error:', ...params)
+  console.error(new Date(), ':', 'error:', format(...params))
 
   if (conf.NODE_ENV !== ENV.DBG || !DI.em) {
     return
   }
   // write to the db
   const em = DI.em.fork()
-  em.create(Log, {type: 'error', message: util.format(...params)})
+  em.create(Log, {
+    type: 'error',
+    message: format(...params),
+  })
   await em.flush()
 }
 

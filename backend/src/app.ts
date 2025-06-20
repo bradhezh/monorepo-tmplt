@@ -1,18 +1,30 @@
 import express from 'express'
 import 'express-async-errors'
-import {MikroORM, EntityManager} from '@mikro-orm/core'
+import {MikroORM, EntityManager, RequestContext} from '@mikro-orm/core'
 
 import {ENV} from '@shared/const'
+import {MESSAGE} from '@/const'
 import conf from '@/conf'
 import log from '@/utils/log'
 import confDb from '@/models/mikro-orm.config'
 import confLog from '@/models/log/mikro-orm.config'
 import {reqLogger, unknownEp, errHandler} from '@/utils/middleware'
-import diariesRouter from '@/controllers/diaries'
+import usersRouter from '@/controllers/users'
+import itemsRouter from '@/controllers/items'
 
-export const DI: Partial<{
-  db: MikroORM, dbLog: MikroORM, em: EntityManager,
-}> = {}
+export const DI: {
+  db?: MikroORM
+  dbLog?: MikroORM
+  em?: EntityManager
+  getEm: () => EntityManager
+} = {
+  getEm() {
+    if (!this.em) {
+      throw new Error(MESSAGE.EM_UNINITED)
+    }
+    return this.em
+  }
+}
 
 export const app = express()
 
@@ -48,7 +60,11 @@ export const init = async () => {
     res.json(conf.VERSION)
   })
 
-  app.use(conf.ITEMS_EP, diariesRouter)
+  app.use((_req, _res, next) => {
+    RequestContext.create(DI.getEm(), next)
+  })
+  app.use(conf.ITEMS_EP, itemsRouter)
+  app.use(conf.USERS_EP, usersRouter)
   app.use(unknownEp)
   app.use(errHandler)
 }

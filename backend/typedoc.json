@@ -7,7 +7,9 @@
     "**/index.ts",
     "**/app.ts",
     "**/express.d.ts",
-    "**/*.test.*"
+    "**/*.test.*",
+    "**/migrations/**",
+    "**/migrationstest/**"
   ],
   "out": "../docs/backend",
   "customCss": "../doc.css",

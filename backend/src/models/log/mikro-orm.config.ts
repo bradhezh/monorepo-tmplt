@@ -9,6 +9,9 @@ export default defineConfig({
   ensureIndexes: true,
   implicitTransactions: true,
   entities: [Log],
-  migrations: {path: path.join(__dirname, 'migrations'), emit: 'ts'},
+  migrations: {
+    path: path.join(__dirname, 'migrations'),
+    emit: 'ts',
+  },
   debug: false,
 })

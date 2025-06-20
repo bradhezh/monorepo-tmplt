@@ -3,17 +3,20 @@ import TestAgent from 'supertest/lib/agent'
 
 import {HTTP_STATUS} from '@/const'
 import conf from '@/conf'
+import {ItemCategory} from '@shared/schemas'
 import {Item} from '@/models/entities'
 import {DI, app, init} from './app'
 
 const items = [{
   name: 'test item 1',
-  createdAt: new Date(),
-  updatedAt: new Date(),
+  category: ItemCategory.Book,
+  price: 100,
+  stock: 10,
 }, {
   name: 'test item 2',
-  createdAt: new Date(),
-  updatedAt: new Date(),
+  category: ItemCategory.Electronics,
+  price: 200,
+  stock: 20,
 }]
 
 let api: TestAgent
@@ -23,7 +26,7 @@ describe('app', () => {
     await init()
     api = supertest(app)
 
-    const em = DI.em!.fork()
+    const em = DI.getEm().fork()
     await em.nativeDelete(Item, {})
     for (const item of items) {
       em.create(Item, item)

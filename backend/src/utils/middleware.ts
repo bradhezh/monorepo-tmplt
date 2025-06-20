@@ -7,7 +7,6 @@ import {ENV} from '@shared/const'
 import {HTTP_STATUS, HttpStatus, ERROR, MESSAGE} from '@/const'
 import conf from '@/conf'
 import log from '@/utils/log'
-import {DiarySchema} from '@/data/diaries'
 
 export class MiddlewareErr extends Error {
   name = ERROR.MIDDLEWARE
@@ -19,7 +18,7 @@ export class MiddlewareErr extends Error {
   }
 }
 
-/** Log requests before they're handled, only for "debug" and development. */
+/** Log requests before they're handled, only for "debug" or development. */
 export const reqLogger = (req: Request, _res: Response, next: NextFunction) => {
   log.debug(req.method, req.path).catch(console.log)
   if (conf.NODE_ENV === ENV.DEV) {
@@ -41,7 +40,6 @@ export const unknownEp = (_req: Request, res: Response, next: NextFunction) => {
 export const errHandler = (
   err: unknown, _req: Request, res: Response, next: NextFunction,
 ) => {
-
   // type narrowing
   if (!(err instanceof Error)) {
     throw new Error(MESSAGE.UNKNOWN)
@@ -60,15 +58,4 @@ export const errHandler = (
 
   // pass to the default one
   next(err)
-}
-
-/** Validate req.body as type DiaryData. req.validatedBody will be the validated
-  one. */
-export const diaryParser = (
-  req: Request, _res: Response, next: NextFunction,
-) => {
-
-  // based on zod schemas, still throwing errors when failing
-  req.validatedBody = DiarySchema.parse(req.body)
-  next()
 }

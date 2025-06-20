@@ -3,18 +3,24 @@ import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config({
-  ignores: ['dist', 'build'],
+  ignores: ['dist', 'build', '**/migrations', '**/migrationstest'],
 }, {
   extends: [js.configs.recommended, ...tseslint.configs.recommendedTypeChecked],
   files: ['**/*.ts'],
   languageOptions: {
-    ecmaVersion: 2020, globals: globals.node,
-    parserOptions: {project: true, tsconfigRootDir: import.meta.dirname},
+    ecmaVersion: 2020,
+    globals: globals.node,
+    parserOptions: {
+      project: true,
+      tsconfigRootDir: import.meta.dirname,
+    },
   },
   rules: {
-    'no-trailing-spaces': 'error', 'linebreak-style': ['error', 'unix'],
+    'no-trailing-spaces': 'error',
+    'linebreak-style': ['error', 'unix'],
     'indent': ['warn', 2],
-    'quotes': ['warn', 'single'], 'semi': ['warn', 'never'],
+    'quotes': ['warn', 'single'],
+    'semi': ['warn', 'never'],
     'eqeqeq': 'error',
     'no-constant-condition': 'warn',
     '@typescript-eslint/no-explicit-any': 'warn',
@@ -23,8 +29,6 @@ export default tseslint.config({
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/restrict-template-expressions': 'off',
     '@typescript-eslint/restrict-plus-operands': 'off',
-    '@typescript-eslint/no-unused-vars': [
-      'error', {'argsIgnorePattern': '^_'},
-    ],
+    '@typescript-eslint/no-unused-vars': ['error', {'argsIgnorePattern': '^_'}],
   },
 })
