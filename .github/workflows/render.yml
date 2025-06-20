@@ -37,7 +37,7 @@ jobs:
           DB_URL_TEST: ${{ secrets.DB_URL_TEST }}
         run: pnpm test
       - name: Build
-        run: pnpm build
+        run: pnpm build:cicd
       - name: Trigger Deployment on Render
         #if: false
         # only deploy on (after) pushing (merging) to "master"
