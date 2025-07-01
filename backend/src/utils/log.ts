@@ -12,7 +12,7 @@ export const init = ({em}: {em: EntityManager}) => {
 }
 
 /** No effect for "test".
-  @param params - Format sequences like "%s", "%d" can be used in params. */
+  @param params - Format sequences like `%s`, `%d` can be used in params. */
 export const info = async (...params: unknown[]) => {
   if (conf.NODE_ENV === ENV.TEST) {
     return
@@ -32,7 +32,7 @@ export const info = async (...params: unknown[]) => {
 }
 
 /** Only effective for "debug" or development.
-  @param params - Format sequences like "%s", "%d" can be used in params. */
+  @param params - Format sequences like `%s`, `%d` can be used in params. */
 export const debug = async (...params: unknown[]) => {
   if (conf.NODE_ENV !== ENV.DBG && conf.NODE_ENV !== ENV.DEV) {
     return
@@ -51,7 +51,7 @@ export const debug = async (...params: unknown[]) => {
   await em.flush()
 }
 
-/** @param params - Format sequences like "%s", "%d" can be used in params. */
+/** @param params - Format sequences like `%s`, `%d` can be used in params. */
 export const error = async (...params: unknown[]) => {
   console.error(new Date(), ':', 'error:', format(...params))
 

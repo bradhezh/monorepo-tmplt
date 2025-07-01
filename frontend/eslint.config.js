@@ -24,8 +24,8 @@ export default tseslint.config({ignores: ['dist']}, {
     'react-refresh/only-export-components': [
       'warn', {allowConstantExport: true},
     ],
-    'no-trailing-spaces': 'error',
-    'linebreak-style': ['error', 'unix'],
+    'no-trailing-spaces': 'warn',
+    'linebreak-style': ['warn', 'unix'],
     'indent': ['warn', 2],
     'quotes': ['warn', 'single'],
     'semi': ['warn', 'never'],

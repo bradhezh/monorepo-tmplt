@@ -12,7 +12,7 @@ export enum ItemPropFilter {
   Stock = 'stock',
   CreatedAt = 'createdAt',
   UpdatedAt = 'updatedAt',
-  // orderBy username actually
+  // orderBy `username` actually
   User = 'user',
 }
 
@@ -71,7 +71,7 @@ export type ItemFilter = z.infer<typeof itemSchemaFilter>
 /** Response with one item */
 export const itemSchema = itemSchemaData.omit({user: true}).extend({
   id: z.number().int().positive(),
-  // actually, if item.user is a reference, like for creation or update, it'll
+  // actually, if `item.user` is a reference, like for creation or update, it'll
   // be serialised to its primary key, which should also be included here for
   // frontend validation; typically id for creation or update, entity for
   // getting and search

@@ -32,8 +32,6 @@ describe('app', () => {
       em.create(Item, item)
     }
     await em.flush()
-
-    console.log('Before tests.')
   })
 
   describe('version', () => {
@@ -46,6 +44,5 @@ describe('app', () => {
 
   afterAll(async () => {
     await DI.db?.close()
-    console.log('After tests.')
   })
 })

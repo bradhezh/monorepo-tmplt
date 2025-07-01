@@ -7,7 +7,7 @@ import {User} from './User'
 @Entity()
 export class Item extends Base {
   @Property() @Unique()
-  // must be from em.create(...)
+  // must be from `em.create(...)`
   name!: string
 
   @Property({type: 'string'})

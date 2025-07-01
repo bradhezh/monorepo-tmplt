@@ -14,7 +14,7 @@ import usersSvc from '@/services/users'
 
 export const usersRouter = express.Router()
 
-/** GET /api/users */
+/** `GET /api/users` */
 export const getAll = async (
   req: Request<unknown, unknown, UserPagi>, res: Response<Users>,
 ) => {
@@ -25,7 +25,7 @@ export const getAll = async (
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 usersRouter.get('/', getAll)
 
-/** GET /api/users/id/:id */
+/** `GET /api/users/id/:id` */
 export const getById = async (req: Request, res: Response<UserType>) => {
   const id = z.coerce.number().int().positive().parse(req.params.id)
   const user = await usersSvc.getById(id)
@@ -34,7 +34,7 @@ export const getById = async (req: Request, res: Response<UserType>) => {
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 usersRouter.get(conf.BY_ID, getById)
 
-/** POST /api/users/search */
+/** `POST /api/users/search` */
 export const search = async (
   req: Request<unknown, unknown, UserFilter>, res: Response<Users>,
 ) => {
@@ -45,7 +45,7 @@ export const search = async (
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 usersRouter.post(conf.SEARCH, search)
 
-/** POST /api/users */
+/** `POST /api/users` */
 export const create = async (
   req: Request<unknown, unknown, UserData>, res: Response<UserType>,
 ) => {
@@ -57,7 +57,7 @@ export const create = async (
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 usersRouter.post('/', create)
 
-/** PATCH /api/users/id/:id */
+/** `PATCH /api/users/id/:id` */
 export const update = async (
   req: Request<{id: string}, unknown, UserDataOpt>, res: Response<UserType>,
 ) => {
@@ -72,7 +72,7 @@ export const update = async (
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 usersRouter.patch(conf.BY_ID, update)
 
-/** DELETE /api/users/id/:id */
+/** `DELETE /api/users/id/:id` */
 export const remove = async (req: Request, res: Response) => {
   const id = z.coerce.number().int().positive().parse(req.params.id)
   await usersSvc.remove(id)
@@ -81,7 +81,7 @@ export const remove = async (req: Request, res: Response) => {
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 usersRouter.delete(conf.BY_ID, remove)
 
-/** DELETE /api/users */
+/** `DELETE /api/users` */
 export const removeBulk = async (
   req: Request<unknown, unknown, Ids>, res: Response,
 ) => {

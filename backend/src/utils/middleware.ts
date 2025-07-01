@@ -12,7 +12,7 @@ export class MiddlewareErr extends Error {
   name = ERROR.MIDDLEWARE
 
   /** @param messages
-    Format sequences like "%s", "%d" can be used in messages. */
+    Format sequences like `%s`, `%d` can be used in messages. */
   constructor(public status: HttpStatus, ...messages: unknown[]) {
     super(format(...messages))
   }
@@ -47,8 +47,8 @@ export const errHandler = (
   log.error(err.name, err.message).catch(console.log)
 
   if (err instanceof z.ZodError) {
-    // causing frontend axios to throw "error" including the object from json as
-    // error.response.data
+    // causing frontend axios to throw `error` including the object from json as
+    // `error.response.data`
     return res.status(HTTP_STATUS.BAD_REQ).json({message: err.message})
   }
 

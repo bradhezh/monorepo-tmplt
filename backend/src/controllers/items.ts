@@ -13,7 +13,7 @@ import itemsSvc from '@/services/items'
 
 export const itemsRouter = express.Router()
 
-/** GET /api/items */
+/** `GET /api/items` */
 export const getAll = async (
   req: Request<unknown, unknown, ItemPagi>, res: Response<Items>,
 ) => {
@@ -24,7 +24,7 @@ export const getAll = async (
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 itemsRouter.get('/', getAll)
 
-/** GET /api/items/id/:id */
+/** `GET /api/items/id/:id` */
 export const getById = async (req: Request, res: Response<ItemType>) => {
   const id = z.coerce.number().int().positive().parse(req.params.id)
   const item = await itemsSvc.getById(id)
@@ -33,7 +33,7 @@ export const getById = async (req: Request, res: Response<ItemType>) => {
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 itemsRouter.get(conf.BY_ID, getById)
 
-/** POST /api/items/search */
+/** `POST /api/items/search` */
 export const search = async (
   req: Request<unknown, unknown, ItemFilter>, res: Response<Items>,
 ) => {
@@ -44,7 +44,7 @@ export const search = async (
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 itemsRouter.post(conf.SEARCH, search)
 
-/** POST /api/items */
+/** `POST /api/items` */
 export const create = async (
   req: Request<unknown, unknown, ItemData>, res: Response<ItemType>,
 ) => {
@@ -55,7 +55,7 @@ export const create = async (
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 itemsRouter.post('/', create)
 
-/** PATCH /api/items/id/:id */
+/** `PATCH /api/items/id/:id` */
 export const update = async (
   req: Request<{id: string}, unknown, ItemDataOpt>, res: Response<ItemType>,
 ) => {
@@ -67,7 +67,7 @@ export const update = async (
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 itemsRouter.patch(conf.BY_ID, update)
 
-/** DELETE /api/items/id/:id */
+/** `DELETE /api/items/id/:id` */
 export const remove = async (req: Request, res: Response) => {
   const id = z.coerce.number().int().positive().parse(req.params.id)
   await itemsSvc.remove(id)
@@ -76,7 +76,7 @@ export const remove = async (req: Request, res: Response) => {
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 itemsRouter.delete(conf.BY_ID, remove)
 
-/** DELETE /api/items */
+/** `DELETE /api/items` */
 export const removeBulk = async (
   req: Request<unknown, unknown, Ids>, res: Response,
 ) => {

@@ -2,9 +2,7 @@ import js from '@eslint/js'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
-export default tseslint.config({
-  ignores: ['dist', 'build', '**/migrations', '**/migrationstest'],
-}, {
+export default tseslint.config({ignores: ['dist']}, {
   extends: [js.configs.recommended, ...tseslint.configs.recommendedTypeChecked],
   files: ['**/*.ts'],
   languageOptions: {
@@ -16,8 +14,8 @@ export default tseslint.config({
     },
   },
   rules: {
-    'no-trailing-spaces': 'error',
-    'linebreak-style': ['error', 'unix'],
+    'no-trailing-spaces': 'warn',
+    'linebreak-style': ['warn', 'unix'],
     'indent': ['warn', 2],
     'quotes': ['warn', 'single'],
     'semi': ['warn', 'never'],

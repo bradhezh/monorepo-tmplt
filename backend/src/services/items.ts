@@ -3,7 +3,9 @@ import {
   Ids, ItemPagi, ItemFilter, ItemData, ItemDataOpt, ItemType, Items,
   Order, ItemPropFilter, UserPropFilter,
 } from '@shared/schemas'
-//import {User} from '@/models/entities'
+/*
+import {User} from '@/models/entities'
+*/
 import {Item} from '@/models/entities'
 
 const orderBy = (prop: ItemPropFilter, order: Order) => {
@@ -66,15 +68,15 @@ export const search = async (filter: ItemFilter): Promise<Items> => {
 
 export const create = async (data: ItemData): Promise<ItemType> => {
   const em = DI.getEm()
-  /* only for like Mongo without foreign key constraints
+  /* only for like mongo without foreign key constraints
   if (data.user) {
     await em.findOneOrFail(User, data.user)
   }
   */
-  // with a user id specified, item.user will also be a reference by default,
-  // unless the related user is already cached, then item.user will be the found
-  // user; note that mikro always annotates item.user as User, although a user
-  // reference is actually not assignable to it
+  // with a user id specified, `item.user` will also be a reference by default,
+  // unless the related user is already cached, then `item.user` will be the
+  // found user; note that mikro always annotates `item.user` as `User`,
+  // although a user reference is actually not assignable to it
   const item = em.create(Item, data)
   await em.flush()
   return item
@@ -84,12 +86,12 @@ export const update = async (
   id: number, data: ItemDataOpt,
 ): Promise<ItemType> => {
   const em = DI.getEm()
-  /* only for like Mongo without foreign key constraints
+  /* only for like mongo without foreign key constraints
   if (data.user) {
     await em.findOneOrFail(User, data.user)
   }
   */
-  // note that mikro always annotates item.user as User, although a user
+  // note that mikro always annotates `item.user` as `User`, although a user
   // reference is actually not assignable to it
   const item = await em.findOneOrFail(Item, id)
   Object.assign(item, data)

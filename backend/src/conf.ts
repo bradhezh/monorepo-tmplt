@@ -28,9 +28,14 @@ const conf = {
   /** Flexible or sensitive configuration included in .env: should be set in
     CICD pipelines but not in the cloud. */
   DB_URL_TEST: process.env.DB_URL_TEST!,
-
+  /** Flexible or sensitive configuration included in .env: should be set in the
+    cloud but unnecessary in CICD pipelines. */
   SALT: Number(process.env.SALT) || 5,
+  /** Flexible or sensitive configuration included in .env: should be set in the
+    cloud but unnecessary in CICD pipelines. */
   INI_ADMIN: process.env.INI_ADMIN || 'admin',
+  /** Flexible or sensitive configuration included in .env: should be set in the
+    cloud but unnecessary in CICD pipelines. */
   INI_ADMIN_PASSWD: process.env.INI_ADMIN_PASSWD || '888888',
 
   VER_EP: '/version',
@@ -53,5 +58,5 @@ export default {
   async cryptAdminPasswd() {
     (this as any).INI_ADMIN_PASSWD =
       await bcrypt.hash(this.INI_ADMIN_PASSWD, this.SALT)
-  }
+  },
 } as const
