@@ -20,7 +20,10 @@ export class User extends Base {
   })
   password!: string
 
-  // inverse side (mapped by)
-  @OneToMany(() => Item, item => item.user)
+  @OneToMany({
+    entity: () => Item,
+    // inverse side
+    mappedBy: (item) => item.user,
+  })
   items = new Collection<Item>(this)
 }

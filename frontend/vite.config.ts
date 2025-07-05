@@ -1,5 +1,5 @@
 import {defineConfig} from 'vitest/config'
-// for react transpilation and optimisation
+// for React transpilation and optimisation
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
@@ -24,7 +24,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: 'src/setupTests.ts',
-    // making test funcs such as test, describe, and expect global for js
+    // making test funcs such as `test`, `describe`, and `expect` global for js
     globals: true,
   },
 })

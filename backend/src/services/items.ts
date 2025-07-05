@@ -73,10 +73,8 @@ export const create = async (data: ItemData): Promise<ItemType> => {
     await em.findOneOrFail(User, data.user)
   }
   */
-  // with a user id specified, `item.user` will also be a reference by default,
-  // unless the related user is already cached, then `item.user` will be the
-  // found user; note that mikro always annotates `item.user` as `User`,
-  // although a user reference is actually not assignable to it
+  // user id can be specified in data, and then `item.user` created will be a
+  // reference (unless the related user is already cached)
   const item = em.create(Item, data)
   await em.flush()
   return item
@@ -91,8 +89,8 @@ export const update = async (
     await em.findOneOrFail(User, data.user)
   }
   */
-  // note that mikro always annotates `item.user` as `User`, although a user
-  // reference is actually not assignable to it
+  // user id can be specified in data, and then `item.user` updated will still
+  // be a reference (unless the related user is already cached)
   const item = await em.findOneOrFail(Item, id)
   Object.assign(item, data)
   await em.flush()

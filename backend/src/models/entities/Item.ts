@@ -23,6 +23,9 @@ export class Item extends Base {
   stock!: number
 
   // owning side (by default)
-  @ManyToOne(() => User, {nullable: true})
+  @ManyToOne({
+    entity: () => User,
+    nullable: true,
+  })
   user?: User
 }

@@ -9,7 +9,7 @@ export abstract class Base {
 
   @Property({
     // `lazy`: excluded in queries by default; can be included via populating:
-    // `em.populate(item, ['lazy_prop_name'])`
+    // `em.populate(entity, ['lazy_prop_name'])`
     lazy: true,
     // `hidden`: hidden in serialisation (json)
     hidden: true,

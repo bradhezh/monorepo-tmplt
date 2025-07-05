@@ -3,7 +3,7 @@ import common from '@shared/conf'
 const conf = {
   ...common,
 
-  // injected by Vite
+  // injected by vite
   ENV: import.meta.env,
 } as const
 

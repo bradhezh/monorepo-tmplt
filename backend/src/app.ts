@@ -6,8 +6,8 @@ import {ENV} from '@shared/const'
 import {MESSAGE} from '@/const'
 import conf from '@/conf'
 import log from '@/utils/log'
-import confDb from '@/models/mikro-orm.config'
-import confLog from '@/models/log/mikro-orm.config'
+import ormConfig from '@/models/mikro-orm.config'
+import ormConfigLog from '@/models/log/mikro-orm.config'
 import {reqLogger, unknownEp, errHandler} from '@/utils/middleware'
 import usersRouter from '@/controllers/users'
 import itemsRouter from '@/controllers/items'
@@ -29,10 +29,10 @@ export const DI: {
 export const app = express()
 
 export const init = async () => {
-  DI.db = await MikroORM.init(confDb)
+  DI.db = await MikroORM.init(ormConfig)
   DI.em = DI.db.em
   if (conf.NODE_ENV === ENV.DBG) {
-    DI.dbLog = await MikroORM.init(confLog)
+    DI.dbLog = await MikroORM.init(ormConfigLog)
     log.init({em: DI.dbLog.em})
   }
 
