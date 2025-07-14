@@ -1,5 +1,4 @@
 import {defineConfig} from '@mikro-orm/mongodb'
-import path from 'path'
 
 import conf from '@/conf'
 import {Log} from '@/models/log/entities'
