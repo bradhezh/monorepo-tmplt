@@ -29,7 +29,6 @@ CODEOWNERS
 # is still needed by build
 jest.config.js
 *.test.*
-migrationstest
 
 jsdoc.json
 typedoc.json

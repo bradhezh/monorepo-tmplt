@@ -31,13 +31,13 @@ jobs:
         run: pnpm i --frozen-lockfile
       - name: Lint
         run: pnpm lint
+      - name: Build
+        run: pnpm build
       - name: Test
         # flexible or sensitive for testing, as env vars in the pipeline
         env:
           DB_URL_TEST: ${{ secrets.DB_URL_TEST }}
         run: pnpm test
-      - name: Build
-        run: pnpm build
       - name: Trigger Deployment on Render
         #if: false
         # only deploy on (after) pushing (merging) to "master"
@@ -52,5 +52,5 @@ jobs:
         with:
           personal_token: ${{ secrets.PERSONAL_TOKEN }}
           publish_dir: ./docs
-          external_repository: bradhezh/monorepo-doc
+          external_repository: bradhezh/monorepo-mikro-doc
           publish_branch: main

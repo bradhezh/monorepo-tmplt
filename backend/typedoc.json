@@ -8,8 +8,7 @@
     "**/app.ts",
     "**/express.d.ts",
     "**/*.test.*",
-    "**/migrations/**",
-    "**/migrationstest/**"
+    "**/migrations/**"
   ],
   "out": "../docs/backend",
   "customCss": "../doc.css",

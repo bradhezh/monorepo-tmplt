@@ -2,9 +2,7 @@ import js from '@eslint/js'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
-export default tseslint.config({
-  ignores: ['dist', 'build', '**/migrations', '**/migrationstest'],
-}, {
+export default tseslint.config({ignores: ['dist', 'build', '**/migrations']}, {
   extends: [js.configs.recommended, ...tseslint.configs.recommendedTypeChecked],
   files: ['**/*.ts'],
   languageOptions: {
