@@ -29,10 +29,10 @@ jobs:
           version: 10
       - name: Install Dependencies
         run: pnpm i --frozen-lockfile
-      - name: Lint
-        run: pnpm lint
       - name: Build
         run: pnpm build
+      - name: Lint
+        run: pnpm lint
       - name: Test
         # flexible or sensitive for testing, as env vars in the pipeline
         env:
