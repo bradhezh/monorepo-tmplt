@@ -1,18 +1,15 @@
-import {app, init} from '@/app'
+import {app, prisma, prismaLog} from '@/app'
 import {MESSAGE} from '@/const'
 import conf from '@/conf'
 import log from '@/utils/log'
 
-void (async () => {
-  try {
-    await init()
-    app.listen(conf.PORT, () => {
-      log.info(MESSAGE.APP_STARTED, conf.PORT).catch(console.log)
-    })
-  } catch (err) {
-    if (err instanceof Error) {
-      return log.error(`${err.name}: ${err.message}`).catch(console.log)
-    }
-    log.error(err).catch(console.log)
-  }
-})()
+process.on('SIGINT', async () => {
+  await log.debug('SIGINT: end the app')
+  await prisma?.$disconnect()
+  await prismaLog?.$disconnect()
+  process.exit(0)
+})
+
+app.listen(conf.PORT, () => {
+  log.info(MESSAGE.APP_STARTED, conf.PORT).catch(console.log)
+})

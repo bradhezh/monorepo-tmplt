@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "client"
+}
+
+generator zod {
+  provider    = "zod-prisma"
+  output      = "../../shared/src/schemas/prisma"
+  modelCase   = "camelCase"
+  modelSuffix = "Schema"
+  imports     = "../../shared/src/conf"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int       @id @default(autoincrement())
+  /// @zod.coerce
+  created_at  DateTime  @default(now())
+  /// @zod.coerce
+  updated_at  DateTime?
+  /// @zod.min(imports.default.USERNAME_MIN).max(imports.default.USERNAME_MAX).regex(/^[a-zA-Z][a-zA-Z0-9_]*$/, {message: imports.MESSAGE.INV_USERNAME})
+  username    String    @unique
+  /// @zod.max(imports.default.NAME_MAX).regex(/^[a-zA-Z\s-]*$/, {message: imports.MESSAGE.INV_NAME})
+  name        String?
+  /// @zod.email()
+  email       String?
+  /// @zod.min(imports.default.PASSWD_MIN).max(imports.default.PASSWD_MAX).regex(/[A-Za-z]/, {message: imports.MESSAGE.INV_PASSWD_LETTER_REQUIRED}).regex(/[0-9]/, {message: imports.MESSAGE.INV_PASSWD_NUM_REQUIRED})
+  password    String
+  items       Item[]
+}
+
+model Item {
+  id          Int           @id @default(autoincrement())
+  /// @zod.coerce
+  created_at  DateTime      @default(now())
+  /// @zod.coerce
+  updated_at  DateTime?
+  /// @zod.min(1).max(imports.default.NAME_MAX)
+  name        String        @unique
+  /// @zod.custom(z.enum(["BOOK", "ELECTRONICS", "MISC"]))
+  category    String
+  /// @zod.nonnegative()
+  price       Decimal       @db.Decimal(10, 2)
+  /// @zod.nonnegative()
+  stock       Int
+  user_id     Int?
+  user  User? @relation(fields: [user_id], references: [id], onDelete: SetNull)
+}

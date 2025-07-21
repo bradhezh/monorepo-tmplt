@@ -1,59 +1,62 @@
 import {z} from 'zod'
 
-import {MESSAGE} from '@shared/const'
-import conf from '@shared/conf'
-import {createdAtSchema, pagiSchema, listSchema} from '@shared/schemas/base'
+import {pagiSchema, filterSchema, listSchema} from '@shared/schemas/base'
+import {itemSchemaRes} from '@shared/schemas'
+import {userSchema} from '@shared/schemas/prisma'
 
-export enum UserPropFilter {
-  Username = 'username',
-  Name = 'name',
-  Email = 'email',
-  CreatedAt = 'createdAt',
-  UpdatedAt = 'updatedAt',
-}
+const autos = ['id', 'created_at', 'updated_at'] as const
+export const userExcludes = ['password'] as const
+export const userRelations = () => {return {items: itemSchemaRes.array()}}
 
-/** Requests for password modification */
-export const passwdSchema = z.object({
-  password: z.string().min(conf.PASSWD_MIN).max(conf.PASSWD_MAX)
-    .regex(/[A-Za-z]/, {message: MESSAGE.INV_PASSWD_LETTER_REQUIRED})
-    .regex(/[0-9]/, {message: MESSAGE.INV_PASSWD_NUM_REQUIRED})
-})
-export type Password = z.infer<typeof passwdSchema>
-
-/** Requests for login */
-export const credentialSchema = passwdSchema.extend({
-  username: z.string().min(conf.USERNAME_MIN).max(conf.USERNAME_MAX)
-    .regex(/^[a-zA-Z][a-zA-Z0-9_]*$/, {message: MESSAGE.INV_USERNAME}),
-})
-export type Credential = z.infer<typeof credentialSchema>
+const filterKeys = Object.keys(userSchema.shape).filter(
+  (e) => !userExcludes.includes(e as typeof userExcludes[number]))
 
 /** Requests for creation */
-export const userSchemaData = credentialSchema.extend({
-  name: z.string().max(conf.NAME_MAX)
-    .regex(/^[a-zA-Z\s-]*$/, {message: MESSAGE.INV_NAME}).optional(),
-  email: z.string().email().optional(),
-})
+export const userSchemaData = userSchema.omit(Object.fromEntries(
+  autos.map((e) => [e, true])) as {[E in typeof autos[number]]: true})
 export type UserData = z.infer<typeof userSchemaData>
 
 /** Requests for update */
-export const userSchemaDataOpt = userSchemaData.partial()
+export const userSchemaDataOpt = userSchemaData.partial().omit(
+  Object.fromEntries(userExcludes.map((e) => [e, true])) as {
+    [E in typeof userExcludes[number]]: true
+  })
 export type UserDataOpt = z.infer<typeof userSchemaDataOpt>
 
+/** Response with one user (default) */
+export const userSchemaRes = userSchema.omit(Object.fromEntries(
+  userExcludes.map((e) => [e, true])) as {
+    [E in typeof userExcludes[number]]: true
+  })
+export type UserRes = z.infer<typeof userSchemaRes>
+
+/** Response with one user (related) */
+export const userSchemaResRelated =
+  z.lazy(() => userSchemaRes.extend(userRelations()))
+export type UserResRelated = z.infer<typeof userSchemaResRelated>
+
+/** Response with users (default) */
+export const userSchemaResList = listSchema(userSchemaRes)
+export type UserResList = z.infer<typeof userSchemaResList>
+
+/** Response with users (related) */
+export const userSchemaResListRelated = listSchema(userSchemaResRelated)
+export type UserResListRelated = z.infer<typeof userSchemaResListRelated>
+
 /** Requests with pagination */
-export const userSchemaPagi = pagiSchema(UserPropFilter)
+export const userSchemaPagi = pagiSchema(filterKeys)
 export type UserPagi = z.infer<typeof userSchemaPagi>
 
 /** Requests for search */
-export const userSchemaFilter = userSchemaData.omit({password: true})
-  .partial().merge(userSchemaPagi).and(createdAtSchema)
+export const userSchemaFilter =
+  filterSchema(filterKeys, userSchema.shape).merge(userSchemaPagi)
 export type UserFilter = z.infer<typeof userSchemaFilter>
 
-/** Response with one user */
-export const userSchema = userSchemaData.omit({password: true}).extend({
-  id: z.number().int().positive(),
-})
-export type UserType = z.infer<typeof userSchema>
+/** Requests for password modification */
+export const passwdSchema = z.object({password: userSchema.shape.password})
+export type Password = z.infer<typeof passwdSchema>
 
-/** Response with users */
-export const usersSchema = listSchema(userSchema)
-export type Users = z.infer<typeof usersSchema>
+/** Requests for login */
+export const credentialSchema =
+  passwdSchema.extend({username: userSchema.shape.username})
+export type Credential = z.infer<typeof credentialSchema>

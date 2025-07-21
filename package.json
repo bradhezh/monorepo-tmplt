@@ -1,12 +1,12 @@
 {
-  "name": "monorepo-mikro",
+  "name": "monorepo-tmplt",
   "version": "1.0.0",
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "scripts": {
-    "migrations": "pnpm --filter backend migrations",
+    "migrate": "pnpm --filter backend migrate",
     "copy-dist": "pnpm dlx rimraf backend/dist && pnpm dlx cpx \"frontend/dist/**/*\" backend/dist",
     "build": "pnpm -r build && pnpm copy-dist",
     "start": "pnpm --filter backend start",

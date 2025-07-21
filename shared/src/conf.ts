@@ -1,3 +1,6 @@
+// only for "import" in prisma schemas, not used in src code
+export * from '@shared/const'
+
 const conf = {
   ITEMS_EP: '/api/items',
   USERS_EP: '/api/users',

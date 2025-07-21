@@ -1,70 +1,86 @@
-import {DI} from '@/app'
+import bcrypt from 'bcrypt'
+
+import conf from '@/conf'
 import {
-  Ids, UserPagi, UserFilter, UserData, UserDataOpt, UserType, Users,
+  UserData, UserDataOpt, UserPagi, UserFilter,
+  UserRes, UserResRelated, UserResList, UserResListRelated,
 } from '@shared/schemas'
-import {User} from '@/models/entities'
+import {prisma} from '@/app'
 
-export const getAll = async (pagi: UserPagi): Promise<Users> => {
-  const em = DI.getEm()
-  const [list, total] = await em.findAndCount(User, {}, {
-    ...(pagi.orderBy && {orderBy: {[pagi.orderBy]: pagi.order}}),
-    limit: pagi.pageSize,
-    offset: (pagi.page - 1) * pagi.pageSize,
-  })
-  return {list, total}
-}
-
-export const getById = async (id: number): Promise<UserType> => {
-  const em = DI.getEm()
-  const user = await em.findOneOrFail(User, id)
-  return user
-}
-
-export const search = async (filter: UserFilter): Promise<Users> => {
-  const em = DI.getEm()
-  const [list, total] = await em.findAndCount(User, {
-    ...(filter.username && {username: filter.username}),
-    ...(filter.name && {name: {$like: `%${filter.name}%`}}),
-    ...(filter.email && {email: filter.email}),
-    ...((filter.createdAtMin || filter.createdAtMax) && {
-      createdAt: {
-        ...(filter.createdAtMin && {$gte: filter.createdAtMin}),
-        ...(filter.createdAtMax && {$lte: filter.createdAtMax}),
-      },
+export const getAll = async (
+  pagi: UserPagi, relations?: string[],
+): Promise<UserResList | UserResListRelated> => {
+  return Promise.all([
+    prisma.user.findMany({
+      skip: (pagi.page - 1) * pagi.pageSize,
+      take: pagi.pageSize,
+      ...(!pagi.orderBy
+        ? {} : {orderBy: {[pagi.orderBy as string]: pagi.order}}),
+      ...(!relations?.length
+        ? {} : {include: Object.fromEntries(relations.map(e => [e, true]))}),
     }),
-  }, {
-    ...(filter.orderBy && {orderBy: {[filter.orderBy]: filter.order}}),
-    limit: filter.pageSize,
-    offset: (filter.page - 1) * filter.pageSize,
-  })
-  return {list, total}
+    prisma.user.count(),
+  ])
 }
 
-export const create = async (data: UserData): Promise<UserType> => {
-  const em = DI.getEm()
-  const user = em.create(User, data)
-  await em.flush()
-  return user
+export const getById = async (
+  id: number, relations?: string[],
+): Promise<UserRes | UserResRelated> => {
+  return prisma.user.findUniqueOrThrow({
+    where: {id},
+    ...(!relations?.length
+      ? {} : {include: Object.fromEntries(relations.map(e => [e, true]))}),
+  })
+}
+
+export const search = async (
+  filter: UserFilter, relations?: string[],
+): Promise<UserResList | UserResListRelated> => {
+  const {page, pageSize, order, orderBy, ...where} = filter
+  return Promise.all([
+    prisma.user.findMany({
+      where,
+      skip: (page as number - 1) * (pageSize as number),
+      take: pageSize as number,
+      ...(!orderBy ? {} : {orderBy: {[orderBy as string]: order}}),
+      ...(!relations?.length
+        ? {} : {include: Object.fromEntries(relations.map(e => [e, true]))}),
+    }),
+    prisma.user.count({where}),
+  ])
+}
+
+export const create = async (
+  data: UserData, relations?: string[],
+): Promise<UserRes | UserResRelated> => {
+  data.password = await bcrypt.hash(data.password, conf.SALT)
+  return prisma.user.create({
+    data,
+    ...(!relations?.length
+      ? {} : {include: Object.fromEntries(relations.map(e => [e, true]))}),
+  })
 }
 
 export const update = async (
-  id: number, data: UserDataOpt,
-): Promise<UserType> => {
-  const em = DI.getEm()
-  const user = await em.findOneOrFail(User, id)
-  Object.assign(user, data)
-  await em.flush()
-  return user
+  id: number, data: UserDataOpt, relations?: string[],
+): Promise<UserRes | UserResRelated> => {
+  return prisma.user.update({
+    where: {id},
+    data: {
+      ...data,
+      updated_at: new Date(),
+    },
+    ...(!relations?.length
+      ? {} : {include: Object.fromEntries(relations.map(e => [e, true]))}),
+  })
 }
 
-export const remove = async (id: number) => {
-  const em = DI.getEm()
-  await em.nativeDelete(User, id)
+export const remove = async (id: number): Promise<UserRes> => {
+  return prisma.user.delete({where: {id}})
 }
 
-export const removeBulk = async (ids: Ids) => {
-  const em = DI.getEm()
-  await em.nativeDelete(User, {id: {$in: ids}})
+export const removeBulk = async (ids: number[]) => {
+  return prisma.user.deleteMany({where: {id: {in: ids}}})
 }
 
 export default {getAll, getById, search, create, update, remove, removeBulk}

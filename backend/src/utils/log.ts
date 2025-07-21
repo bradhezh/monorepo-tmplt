@@ -1,14 +1,14 @@
 import {format} from 'util'
-import {EntityManager} from '@mikro-orm/core'
+import {LogType} from '@PrismaClient/log'
 
 import {ENV} from '@shared/const'
 import conf from '@/conf'
-import {Log} from '@/models/log/entities'
+import {PrismaClientLogEx} from '@/app'
 
-const DI: {em?: EntityManager} = {}
+const DI: {prisma?: PrismaClientLogEx} = {}
 
-export const init = ({em}: {em: EntityManager}) => {
-  DI.em = em
+export const init = ({prisma}: {prisma: PrismaClientLogEx}) => {
+  DI.prisma = prisma
 }
 
 /** No effect for "test".
@@ -19,16 +19,16 @@ export const info = async (...params: unknown[]) => {
   }
   console.log(new Date(), ':', format(...params))
 
-  if (conf.NODE_ENV !== ENV.DBG || !DI.em) {
+  if (conf.NODE_ENV !== ENV.DBG || !DI.prisma) {
     return
   }
   // write to the db
-  const em = DI.em.fork()
-  em.create(Log, {
-    type: 'info',
-    message: format(...params),
+  await DI.prisma.log.create({
+    data: {
+      type: LogType.INFO,
+      message: format(...params),
+    },
   })
-  await em.flush()
 }
 
 /** Only effective for "debug" or development.
@@ -39,32 +39,32 @@ export const debug = async (...params: unknown[]) => {
   }
   console.log(new Date(), ':', format(...params))
 
-  if (conf.NODE_ENV !== ENV.DBG || !DI.em) {
+  if (conf.NODE_ENV !== ENV.DBG || !DI.prisma) {
     return
   }
   // write to the db
-  const em = DI.em.fork()
-  em.create(Log, {
-    type: 'debug',
-    message: format(...params),
+  await DI.prisma.log.create({
+    data: {
+      type: LogType.DEBUG,
+      message: format(...params),
+    },
   })
-  await em.flush()
 }
 
 /** @param params - Format sequences like `%s`, `%d` can be used in params. */
 export const error = async (...params: unknown[]) => {
   console.error(new Date(), ':', 'error:', format(...params))
 
-  if (conf.NODE_ENV !== ENV.DBG || !DI.em) {
+  if (conf.NODE_ENV !== ENV.DBG || !DI.prisma) {
     return
   }
   // write to the db
-  const em = DI.em.fork()
-  em.create(Log, {
-    type: 'error',
-    message: format(...params),
+  await DI.prisma.log.create({
+    data: {
+      type: LogType.ERROR,
+      message: format(...params),
+    },
   })
-  await em.flush()
 }
 
 /** Logs will be written into the database (only) for "debug". */

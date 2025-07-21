@@ -52,6 +52,12 @@ export const errHandler = (
     return res.status(HTTP_STATUS.BAD_REQ).json({message: err.message})
   }
 
+  // the type is actually defined in the client (multiple ones in this app)
+  if (err.name === 'PrismaClientKnownRequestError') {
+    return res.status(HTTP_STATUS.BAD_REQ)
+      .json({message: err.message.trimEnd().split('\n').pop() || ''})
+  }
+
   if (err instanceof MiddlewareErr) {
     return res.status(err.status).json({message: err.message})
   }

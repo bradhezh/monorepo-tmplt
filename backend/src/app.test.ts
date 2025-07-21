@@ -3,18 +3,16 @@ import TestAgent from 'supertest/lib/agent'
 
 import {HTTP_STATUS} from '@/const'
 import conf from '@/conf'
-import {ItemCategory} from '@shared/schemas'
-import {Item} from '@/models/entities'
-import {DI, app, init} from './app'
+import {app, prisma} from './app'
 
 const items = [{
   name: 'test item 1',
-  category: ItemCategory.Book,
+  category: 'BOOK',
   price: 100,
   stock: 10,
 }, {
   name: 'test item 2',
-  category: ItemCategory.Electronics,
+  category: 'ELECTRONICS',
   price: 200,
   stock: 20,
 }]
@@ -23,15 +21,12 @@ let api: TestAgent
 
 describe('app', () => {
   beforeAll(async () => {
-    await init()
     api = supertest(app)
 
-    const em = DI.getEm().fork()
-    await em.nativeDelete(Item, {})
+    await prisma.item.deleteMany()
     for (const item of items) {
-      em.create(Item, item)
+      await prisma.item.create({data: item})
     }
-    await em.flush()
   })
 
   describe('version', () => {
@@ -43,6 +38,6 @@ describe('app', () => {
   })
 
   afterAll(async () => {
-    await DI.db?.close()
+    await prisma.$disconnect()
   })
 })

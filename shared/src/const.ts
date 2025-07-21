@@ -10,7 +10,5 @@ export const MESSAGE = {
   INV_NAME: 'Name may contain only letters, spaces, and hyphens.',
   INV_PASSWD_LETTER_REQUIRED: 'Password must include letters.',
   INV_PASSWD_NUM_REQUIRED: 'Password must include numbers.',
-  INV_CREATEDAT: 'createdAtMin cannot be after than createdAtMax.',
-  INV_PRICE: 'priceMin cannot be greater than priceMax.',
-  INV_STOCK: 'stockMin cannot be greater than stockMax.',
+  INV_CONDITION: 'Condition invalid.',
 } as const

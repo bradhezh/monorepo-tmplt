@@ -1,70 +1,49 @@
 import express from 'express'
 import 'express-async-errors'
-import {MikroORM, EntityManager, RequestContext} from '@mikro-orm/core'
+import {withAccelerate} from '@prisma/extension-accelerate'
 
-import {ENV} from '@shared/const'
-import {MESSAGE} from '@/const'
+import {ENV} from '@/const'
 import conf from '@/conf'
+import {PrismaClient as PrismaClientLog} from '@PrismaClient/log'
 import log from '@/utils/log'
-import ormConfig from '@/models/mikro-orm.config'
-import ormConfigLog from '@/models/log/mikro-orm.config'
 import {reqLogger, unknownEp, errHandler} from '@/utils/middleware'
+import {omit} from '@shared/schemas'
+import {PrismaClient} from '@PrismaClient/.'
 import usersRouter from '@/controllers/users'
 import itemsRouter from '@/controllers/items'
 
-export const DI: {
-  db?: MikroORM
-  dbLog?: MikroORM
-  em?: EntityManager
-  getEm: () => EntityManager
-} = {
-  getEm() {
-    if (!this.em) {
-      throw new Error(MESSAGE.EM_UNINITED)
-    }
-    return this.em
-  },
-}
+export const prisma = new PrismaClient({omit}).$extends(withAccelerate())
+export const prismaLog = conf.NODE_ENV !== ENV.DBG
+  ? null : new PrismaClientLog().$extends(withAccelerate())
+export type PrismaClientLogEx = typeof prismaLog
+log.init({prisma: prismaLog})
 
 export const app = express()
 
-export const init = async () => {
-  DI.db = await MikroORM.init(ormConfig)
-  DI.em = DI.db.em
-  if (conf.NODE_ENV === ENV.DBG) {
-    DI.dbLog = await MikroORM.init(ormConfigLog)
-    log.init({em: DI.dbLog.em})
-  }
+// middleware mounted by `app.<method>(...)` is called (valid) only if requests
+// match the method and path (route) exactly (only with minor tolerance like the
+// trailing slash), while `app.use(...)` adopts prefix-based matching and the
+// matched prefix will be stripped from `req.url` before it's passed to the
+// middleware, so a router should exclude the matched prefix from its own routes
 
-  // middleware mounted by `app.<method>(...)` is called (valid) only if
-  // requests match the method and path (route) exactly (only with minor
-  // tolerance like the trailing slash), while `app.use(...)` adopts prefix
-  // -based matching and the matched prefix will be stripped from `req.url`
-  // before it's passed to the middleware, so a router should exclude the
-  // matched prefix from its own routes
+// give static (files) priority over subsequent middleware for `GET`; the path
+// is relative to the cwd
+app.use(express.static(conf.DIST_DIR))
+// deserialise json in requests into `req.body`
+app.use(express.json())
 
-  // give static (files) priority over subsequent middleware for `GET`; the path
-  // is relative to the cwd
-  app.use(express.static(conf.DIST_DIR))
-  // deserialise json in requests into `req.body`
-  app.use(express.json())
+app.use(reqLogger)
 
-  app.use(reqLogger)
+// overridden by dist/index.html due to `express.static(...)`
+app.get('/', (_req, res) => {
+  res.send('<h1>Hello world!</h1>')
+})
+// for deployment or health check
+app.get(conf.VER_EP, (_req, res) => {
+  res.json(conf.VERSION)
+})
 
-  // overridden by dist/index.html due to `express.static(...)`
-  app.get('/', (_req, res) => {
-    res.send('<h1>Hello world!</h1>')
-  })
-  // for deployment or health check
-  app.get(conf.VER_EP, (_req, res) => {
-    res.json(conf.VERSION)
-  })
-
-  app.use((_req, _res, next) => {
-    RequestContext.create(DI.getEm(), next)
-  })
-  app.use(conf.ITEMS_EP, itemsRouter)
-  app.use(conf.USERS_EP, usersRouter)
-  app.use(unknownEp)
-  app.use(errHandler)
-}
+app.use(conf.ITEMS_EP, itemsRouter)
+app.use(conf.USERS_EP, usersRouter)
+app.use(unknownEp)
+app.use(errHandler)

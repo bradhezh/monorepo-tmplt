@@ -1,3 +1,6 @@
+import {MESSAGE as MESSAGE_COMMON} from '@shared/const'
+export * from '@shared/const'
+
 export const HTTP_STATUS = {
   OK: 200,
   CREATED: 201,
@@ -15,8 +18,9 @@ export const ERROR = {
 } as const
 
 export const MESSAGE = {
+  ...MESSAGE_COMMON,
+
   APP_STARTED: 'Server running on port %d.',
-  EM_UNINITED: 'Entity manager not initialised.',
   UNKNOWN_EP: 'Unknown endpoint.',
   UNKNOWN: 'Unknown error.',
 } as const

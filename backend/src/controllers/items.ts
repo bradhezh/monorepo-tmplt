@@ -1,90 +1,85 @@
 import {default as express, Request, Response} from 'express'
-import {z} from 'zod'
 
 import {HTTP_STATUS} from '@/const'
 import conf from '@/conf'
 import {
-  idsSchema, Ids,
-  itemSchemaPagi, ItemPagi, itemSchemaFilter, ItemFilter,
-  itemSchemaData, ItemData, itemSchemaDataOpt, ItemDataOpt,
-  ItemType, Items,
+  paramSchemaId, querySchemaRelated, idsSchema, itemRelations,
+  itemSchemaData, itemSchemaDataOpt, itemSchemaPagi, itemSchemaFilter,
 } from '@shared/schemas'
 import itemsSvc from '@/services/items'
 
 export const itemsRouter = express.Router()
 
-/** `GET /api/items` */
-export const getAll = async (
-  req: Request<unknown, unknown, ItemPagi>, res: Response<Items>,
-) => {
+/** `GET /api/items[?related=true] ItemPagi`<br>
+  => `ItemResList | ItemResListRelated` */
+export const getAll = async (req: Request, res: Response) => {
+  const related = querySchemaRelated.parse(req.query.related)
   const pagi = itemSchemaPagi.parse(req.body)
-  const items = await itemsSvc.getAll(pagi)
+  const items = await itemsSvc.getAll(
+    pagi, !related ? undefined : Object.keys(itemRelations()))
   res.json(items)
 }
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
 itemsRouter.get('/', getAll)
 
-/** `GET /api/items/id/:id` */
-export const getById = async (req: Request, res: Response<ItemType>) => {
-  const id = z.coerce.number().int().positive().parse(req.params.id)
-  const item = await itemsSvc.getById(id)
+/** `GET /api/items/id/:id[?related=true]`<br>
+  => `ItemRes | ItemResRelated` */
+export const getById = async (req: Request, res: Response) => {
+  const related = querySchemaRelated.parse(req.query.related)
+  const id = paramSchemaId.parse(req.params.id)
+  const item = await itemsSvc.getById(
+    id, !related ? undefined : Object.keys(itemRelations()))
   res.json(item)
 }
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
 itemsRouter.get(conf.BY_ID, getById)
 
-/** `POST /api/items/search` */
-export const search = async (
-  req: Request<unknown, unknown, ItemFilter>, res: Response<Items>,
-) => {
+/** `POST /api/items/search[?related=true] ItemFilter`<br>
+  => `ItemResList | ItemResListRelated` */
+export const search = async (req: Request, res: Response) => {
+  const related = querySchemaRelated.parse(req.query.related)
   const filter = itemSchemaFilter.parse(req.body)
-  const items = await itemsSvc.search(filter)
+  const items = await itemsSvc.search(
+    filter, !related ? undefined : Object.keys(itemRelations()))
   res.json(items)
 }
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
 itemsRouter.post(conf.SEARCH, search)
 
-/** `POST /api/items` */
-export const create = async (
-  req: Request<unknown, unknown, ItemData>, res: Response<ItemType>,
-) => {
+/** `POST /api/items[?related=true] ItemData`<br>
+  => `ItemRes | ItemResRelated` */
+export const create = async (req: Request, res: Response) => {
+  const related = querySchemaRelated.parse(req.query.related)
   const data = itemSchemaData.parse(req.body)
-  const item = await itemsSvc.create(data)
+  const item = await itemsSvc.create(
+    data, !related ? undefined : Object.keys(itemRelations()))
   res.status(HTTP_STATUS.CREATED).json(item)
 }
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
 itemsRouter.post('/', create)
 
-/** `PATCH /api/items/id/:id` */
-export const update = async (
-  req: Request<{id: string}, unknown, ItemDataOpt>, res: Response<ItemType>,
-) => {
-  const id = z.coerce.number().int().positive().parse(req.params.id)
+/** `PATCH /api/items/id/:id[?related=true] ItemDataOpt`<br>
+  => `ItemRes | ItemResRelated` */
+export const update = async (req: Request, res: Response) => {
+  const related = querySchemaRelated.parse(req.query.related)
+  const id = paramSchemaId.parse(req.params.id)
   const data = itemSchemaDataOpt.parse(req.body)
-  const item = await itemsSvc.update(id, data)
+  const item = await itemsSvc.update(
+    id, data, !related ? undefined : Object.keys(itemRelations()))
   res.json(item)
 }
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
 itemsRouter.patch(conf.BY_ID, update)
 
 /** `DELETE /api/items/id/:id` */
 export const remove = async (req: Request, res: Response) => {
-  const id = z.coerce.number().int().positive().parse(req.params.id)
+  const id = paramSchemaId.parse(req.params.id)
   await itemsSvc.remove(id)
   res.status(HTTP_STATUS.NO_CONTENT)
 }
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
 itemsRouter.delete(conf.BY_ID, remove)
 
-/** `DELETE /api/items` */
-export const removeBulk = async (
-  req: Request<unknown, unknown, Ids>, res: Response,
-) => {
+/** `DELETE /api/items Ids` */
+export const removeBulk = async (req: Request, res: Response) => {
   const ids = idsSchema.parse(req.body)
   await itemsSvc.removeBulk(ids)
   res.status(HTTP_STATUS.NO_CONTENT)
 }
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
 itemsRouter.delete('/', removeBulk)
 
 export default itemsRouter

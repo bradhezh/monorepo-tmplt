@@ -11,11 +11,12 @@ node_modules
 dist
 dist-ssr
 build
+backend/prisma/client
+shared/src/schemas/prisma
 docs
 *.local
 # .env might include sensitive confs
-.env
-.env.sample
+.env*
 supabase.sql
 
 .git

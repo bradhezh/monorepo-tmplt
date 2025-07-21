@@ -1,110 +1,103 @@
-import {DI} from '@/app'
+import {Prisma} from '@PrismaClient/.'
 import {
-  Ids, ItemPagi, ItemFilter, ItemData, ItemDataOpt, ItemType, Items,
-  Order, ItemPropFilter, UserPropFilter,
+  ItemData, ItemDataOpt, ItemPagi, ItemFilter, ItemRes, ItemResRelated,
 } from '@shared/schemas'
-/*
-import {User} from '@/models/entities'
-*/
-import {Item} from '@/models/entities'
+import {prisma} from '@/app'
 
-const orderBy = (prop: ItemPropFilter, order: Order) => {
-  if (prop !== ItemPropFilter.User) {
-    return {orderBy: {[prop]: order}}
-  }
-  return {orderBy: {[prop]: {[UserPropFilter.Username]: order}}}
+type ItemResPrisma = Omit<ItemRes, 'category' | 'price'>
+  & {category: string} & {price: Prisma.Decimal}
+type ItemResRelatedPrisma = Omit<ItemResRelated, 'category' | 'price'>
+  & {category: string} & {price: Prisma.Decimal}
+type ItemResListPrisma = [ItemResPrisma[], number]
+type ItemResListRelatedPrisma = [ItemResRelatedPrisma[], number]
+
+export const getAll = async (
+  pagi: ItemPagi, relations?: string[],
+): Promise<ItemResListPrisma | ItemResListRelatedPrisma> => {
+  return Promise.all([
+    prisma.item.findMany({
+      skip: (pagi.page - 1) * pagi.pageSize,
+      take: pagi.pageSize,
+      ...(!pagi.orderBy
+        ? {} : {orderBy: {[pagi.orderBy as string]: pagi.order}}),
+      ...(!relations?.length
+        ? {} : {include: Object.fromEntries(relations.map(e => [e, true]))}),
+    }),
+    prisma.item.count(),
+  ])
 }
 
-export const getAll = async (pagi: ItemPagi): Promise<Items> => {
-  const em = DI.getEm()
-  const [list, total] = await em.findAndCount(Item, {}, {
-    ...(pagi.orderBy && orderBy(pagi.orderBy, pagi.order)),
-    limit: pagi.pageSize,
-    offset: (pagi.page - 1) * pagi.pageSize,
-    populate: [ItemPropFilter.User],
+export const getById = async (
+  id: number, relations?: string[],
+): Promise<ItemResPrisma | ItemResRelatedPrisma> => {
+  return prisma.item.findUniqueOrThrow({
+    where: {id},
+    ...(!relations?.length
+      ? {} : {include: Object.fromEntries(relations.map(e => [e, true]))}),
   })
-  return {list, total}
 }
 
-export const getById = async (id: number): Promise<ItemType> => {
-  const em = DI.getEm()
-  const item =
-    await em.findOneOrFail(Item, id, {populate: [ItemPropFilter.User]})
-  return item
+export const search = async (
+  filter: ItemFilter, relations?: string[],
+): Promise<ItemResListPrisma | ItemResListRelatedPrisma> => {
+  const {page, pageSize, order, orderBy, ...where} = filter
+  return Promise.all([
+    prisma.item.findMany({
+      where,
+      skip: (page as number - 1) * (pageSize as number),
+      take: pageSize as number,
+      ...(!orderBy ? {} : {orderBy: {[orderBy as string]: order}}),
+      ...(!relations?.length
+        ? {} : {include: Object.fromEntries(relations.map(e => [e, true]))}),
+    }),
+    prisma.item.count({where}),
+  ])
 }
 
-export const search = async (filter: ItemFilter): Promise<Items> => {
-  const em = DI.getEm()
-  const [list, total] = await em.findAndCount(Item, {
-    ...(filter.category && {category: filter.category}),
-    ...(filter.user && {user: filter.user}),
-    ...(filter.name && {name: {$like: `%${filter.name}%`}}),
-    ...((filter.priceMin || filter.priceMax) && {
-      price: {
-        ...(filter.priceMin && {$gte: filter.priceMin}),
-        ...(filter.priceMax && {$lte: filter.priceMax}),
-      },
-    }),
-    ...((filter.stockMin || filter.stockMax) && {
-      stock: {
-        ...(filter.stockMin && {$gte: filter.stockMin}),
-        ...(filter.stockMax && {$lte: filter.stockMax}),
-      },
-    }),
-    ...((filter.createdAtMin || filter.createdAtMax) && {
-      createdAt: {
-        ...(filter.createdAtMin && {$gte: filter.createdAtMin}),
-        ...(filter.createdAtMax && {$lte: filter.createdAtMax}),
-      },
-    }),
-  }, {
-    ...(filter.orderBy && orderBy(filter.orderBy, filter.order)),
-    limit: filter.pageSize,
-    offset: (filter.page - 1) * filter.pageSize,
-    populate: [ItemPropFilter.User],
-  })
-  return {list, total}
-}
-
-export const create = async (data: ItemData): Promise<ItemType> => {
-  const em = DI.getEm()
+export const create = async (
+  data: ItemData, relations?: string[],
+): Promise<ItemResPrisma | ItemResRelatedPrisma> => {
   /* only for like mongo without foreign key constraints
-  if (data.user) {
-    await em.findOneOrFail(User, data.user)
+  if (data.user_id) {
+    await prisma.user.findUniqueOrThrow({
+      where: {id: data.user_id},
+    })
   }
   */
-  // user id can be specified in data, and then `item.user` created will be a
-  // reference (unless the related user is already cached)
-  const item = em.create(Item, data)
-  await em.flush()
-  return item
+  return prisma.item.create({
+    data,
+    ...(!relations?.length
+      ? {} : {include: Object.fromEntries(relations.map(e => [e, true]))}),
+  })
 }
 
 export const update = async (
-  id: number, data: ItemDataOpt,
-): Promise<ItemType> => {
-  const em = DI.getEm()
+  id: number, data: ItemDataOpt, relations?: string[],
+): Promise<ItemResPrisma | ItemResRelatedPrisma> => {
   /* only for like mongo without foreign key constraints
-  if (data.user) {
-    await em.findOneOrFail(User, data.user)
+  if (data.user_id) {
+    await prisma.user.findUniqueOrThrow({
+      where: {id: data.user_id},
+    })
   }
   */
-  // user id can be specified in data, and then `item.user` updated will still
-  // be a reference (unless the related user is already cached)
-  const item = await em.findOneOrFail(Item, id)
-  Object.assign(item, data)
-  await em.flush()
-  return item
+  return prisma.item.update({
+    where: {id},
+    data: {
+      ...data,
+      updated_at: new Date(),
+    },
+    ...(!relations?.length
+      ? {} : {include: Object.fromEntries(relations.map(e => [e, true]))}),
+  })
 }
 
-export const remove = async (id: number) => {
-  const em = DI.getEm()
-  await em.nativeDelete(Item, id)
+export const remove = async (id: number): Promise<ItemResPrisma> => {
+  return prisma.item.delete({where: {id}})
 }
 
-export const removeBulk = async (ids: Ids) => {
-  const em = DI.getEm()
-  await em.nativeDelete(Item, {id: {$in: ids}})
+export const removeBulk = async (ids: number[]) => {
+  return prisma.item.deleteMany({where: {id: {in: ids}}})
 }
 
 export default {getAll, getById, search, create, update, remove, removeBulk}
