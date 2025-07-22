@@ -2,10 +2,21 @@ import bcrypt from 'bcrypt'
 
 import conf from '@/conf'
 import {
+  userRelations, orderByDefs, Order,
   UserData, UserDataOpt, UserPagi, UserFilter,
   UserRes, UserResRelated, UserResList, UserResListRelated,
 } from '@shared/schemas'
 import {prisma} from '@/app'
+
+const orderBy = (key: string, order: Order) => {
+  if (!Object.keys(userRelations()).map(e => `${e}_id`).includes(key)) {
+    return {orderBy: {[key]: order}}
+  }
+  const relation = key.replace(/_id$/, '') as keyof typeof orderByDefs
+  const orderByDef = orderByDefs[relation]
+  return !orderByDef
+    ? {orderBy: {[key]: order}} : {orderBy: {[relation]: {[orderByDef]: order}}}
+}
 
 export const getAll = async (
   pagi: UserPagi, relations?: string[],
@@ -14,8 +25,7 @@ export const getAll = async (
     prisma.user.findMany({
       skip: (pagi.page - 1) * pagi.pageSize,
       take: pagi.pageSize,
-      ...(!pagi.orderBy
-        ? {} : {orderBy: {[pagi.orderBy as string]: pagi.order}}),
+      ...(!pagi.orderBy ? {} : orderBy(pagi.orderBy as string, pagi.order)),
       ...(!relations?.length
         ? {} : {include: Object.fromEntries(relations.map(e => [e, true]))}),
     }),
@@ -36,13 +46,17 @@ export const getById = async (
 export const search = async (
   filter: UserFilter, relations?: string[],
 ): Promise<UserResList | UserResListRelated> => {
-  const {page, pageSize, order, orderBy, ...where} = filter
+  const {
+    page, pageSize, order,
+    orderBy: pagiOrderBy,
+    ...where
+  } = filter
   return Promise.all([
     prisma.user.findMany({
       where,
       skip: (page as number - 1) * (pageSize as number),
       take: pageSize as number,
-      ...(!orderBy ? {} : {orderBy: {[orderBy as string]: order}}),
+      ...(!pagiOrderBy ? {} : orderBy(pagiOrderBy as string, order as Order)),
       ...(!relations?.length
         ? {} : {include: Object.fromEntries(relations.map(e => [e, true]))}),
     }),

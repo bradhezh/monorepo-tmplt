@@ -27,22 +27,29 @@ export const operators = [{
   name: 'lte',
 }]
 
-/** Requests for deletion */
+/** Zod schema for id in the request parameters. */
+// `coerce` needed here since params are strings
+export const idSchema = z.coerce.number().int()
+/** Type of id from the request parameters. */
+export type Id = z.infer<typeof idSchema>
+
+/** Zod schema for ids in the request body. */
 export const idsSchema = z.number().int().array()
+/** Type of ids from the request body. */
 export type Ids = z.infer<typeof idsSchema>
 
-/** Request Param: id */
-export const paramSchemaId = z.coerce.number().int()
-export type ParamId = z.infer<typeof paramSchemaId>
-
-/** Request Query */
-export const querySchemaRelated = z.coerce.boolean().optional()
-export type QueryRelated = z.infer<typeof querySchemaRelated>
+/** Zod schema for `related` in the request query string. */
+// `coerce` needed here since from the query string
+export const relatedSchema = z.coerce.boolean().optional()
+/** Type of `related` from the request query string. */
+export type Related = z.infer<typeof relatedSchema>
 
 export const pagiSchema = (keys: string[]) => {
   return z.object({
-    page: z.number().int().min(1).default(1),
-    pageSize: z.number().int().min(1).max(conf.PAGE_MAX).default(conf.PAGE_DEF),
+    // `coerce` needed here since maybe from the query string
+    page: z.coerce.number().int().min(1).default(1),
+    pageSize:
+      z.coerce.number().int().min(1).max(conf.PAGE_MAX).default(conf.PAGE_DEF),
     order: z.nativeEnum(Order).default(Order.Asc),
     ...(!keys.length
       ? {} : {orderBy: z.enum(keys as [string, ...string[]]).optional()}),
@@ -52,8 +59,8 @@ export const pagiSchema = (keys: string[]) => {
 const conditionSchema = <T>(schema: ZodType<T>) => {
   return z.union([schema, z.object(
     Object.fromEntries(operators.map(e => [e.name, schema])))
-    .partial().refine((data) => {
-      if (!Object.values(data).some((e) => e))
+    .partial().refine(data => {
+      if (!Object.values(data).some(e => e))
         return false
       for (const op of operators) {
         if (op.type && op.name in data && typeof data[op.name] !== op.type) {
@@ -76,7 +83,7 @@ export const filterSchema = <T extends ZodRawShape>(
   keys: string[], shape: T,
 ) => {
   return z.object(
-    Object.fromEntries(keys.map((e) => [e, conditionSchema(shape[e])])))
+    Object.fromEntries(keys.map(e => [e, conditionSchema(shape[e])])))
     .partial()
 }
 
