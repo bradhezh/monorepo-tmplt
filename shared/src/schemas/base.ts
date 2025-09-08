@@ -1,4 +1,4 @@
-import {z, ZodRawShape, ZodType} from 'zod'
+import {z, ZodRawShape, ZodTypeAny} from 'zod'
 
 import {MESSAGE} from '@shared/const'
 import conf from '@shared/conf'
@@ -18,6 +18,8 @@ export const operators = [{
   name: 'contains',
   type: 'string',
 }, {
+  name: 'in',
+}, {
   name: 'gt',
 }, {
   name: 'gte',
@@ -25,68 +27,104 @@ export const operators = [{
   name: 'lt',
 }, {
   name: 'lte',
-}]
+}] as const
 
-/** Zod schema for id in the request parameters. */
-// `coerce` needed here since params are strings
-export const idSchema = z.coerce.number().int()
-/** Type of id from the request parameters. */
-export type Id = z.infer<typeof idSchema>
+/** Zod schema for "id". */
+export const idSchema = z.object({id: z.coerce.number().int()})
+/** Type of "id". */
+export type Id = z.infer<typeof idSchema>['id']
 
-/** Zod schema for ids in the request body. */
-export const idsSchema = z.number().int().array()
-/** Type of ids from the request body. */
-export type Ids = z.infer<typeof idsSchema>
-
-/** Zod schema for `related` in the request query string. */
-// `coerce` needed here since from the query string
-export const relatedSchema = z.coerce.boolean().optional()
-/** Type of `related` from the request query string. */
-export type Related = z.infer<typeof relatedSchema>
-
-export const pagiSchema = (keys: string[]) => {
+// Zod schema for "includes"
+export const incsSchema = (includes: string[]) => {
+  if (!includes.length) {
+    return z.object({includes: z.never().optional()})
+  }
+  const include = z.enum(includes as [string, ...string[]])
   return z.object({
-    // `coerce` needed here since maybe from the query string
+    includes: z.union([include, include.array().nonempty()])
+      .transform(d => typeof d !== 'string' ? d : [d]).optional(),
+  })
+}
+/** Type of "includes". */
+export type Includes = [string, ...string[]] | undefined
+
+// Zod schema for "page", including pagination and order
+export const pageSchema = (fields: [string, ...string[]]) => {
+  return z.object({
     page: z.coerce.number().int().min(1).default(1),
     pageSize:
       z.coerce.number().int().min(1).max(conf.PAGE_MAX).default(conf.PAGE_DEF),
     order: z.nativeEnum(Order).default(Order.Asc),
-    ...(!keys.length
-      ? {} : {orderBy: z.enum(keys as [string, ...string[]]).optional()}),
+    orderBy: z.enum(fields).optional(),
   })
 }
+/** Type of "page", including pagination, order, and "includes". */
+export type Page =
+  z.infer<ReturnType<typeof pageSchema>> & {includes?: Includes}
 
-const conditionSchema = <T>(schema: ZodType<T>) => {
-  return z.union([schema, z.object(
-    Object.fromEntries(operators.map(e => [e.name, schema])))
-    .partial().refine(data => {
-      if (!Object.values(data).some(e => e))
+const conditionSchema = (schema: ZodTypeAny) => {
+  return z.union([
+    schema.refine(d => d !== undefined, {message: MESSAGE.NON_UNDEFINED}),
+    z.object(Object.fromEntries(operators.map(e => [
+      e.name,
+      e.name !== 'in'
+        ? schema.refine(d => d != null, {message: MESSAGE.NON_NULLISH})
+        : schema.refine(d => d != null, {message: MESSAGE.NON_NULLISH})
+          .array().nonempty(),
+    ]))).partial().refine(d => {
+      if (!Object.keys(d).length) {
         return false
+      }
       for (const op of operators) {
-        if (op.type && op.name in data && typeof data[op.name] !== op.type) {
+        if ('type' in op && op.name in d && typeof d[op.name] !== op.type) {
           return false
         }
       }
-      if (data.gt && data.gte || data.lt && data.lte) {
+      if ('gt' in d && 'gte' in d || 'lt' in d && 'lte' in d) {
         return false
       }
-      const from = data.gt || data.gte
-      const to = data.lt || data.lte
-      if (from && to && from > to) {
+      const from = d.gt ?? d.gte
+      const to = d.lt ?? d.lte
+      if (from != null && to != null && from > to) {
         return false
       }
       return true
-    }, {message: MESSAGE.INV_CONDITION})])
+    }, {message: MESSAGE.INV_CONDITION}),
+  ])
 }
 
-export const filterSchema = <T extends ZodRawShape>(
-  keys: string[], shape: T,
-) => {
+const filterSchemaWithoutOr = (fields: string[], shape: ZodRawShape) => {
   return z.object(
-    Object.fromEntries(keys.map(e => [e, conditionSchema(shape[e])])))
+    Object.fromEntries(fields.map(e => [e, conditionSchema(shape[e])])))
     .partial()
+    .refine(d => Object.keys(d).length, {message: MESSAGE.INV_FILTER})
 }
 
-export const listSchema = <T>(schema: ZodType<T>) => {
+// Zod schema for "filter"
+export const filterSchema = (
+  where: string, fields: string[], shape: ZodRawShape,
+) => {
+  const schema = filterSchemaWithoutOr(fields, shape)
+  return z.object({
+    [where]:
+      z.union([schema, z.object({OR: schema.array().nonempty()})]).nullish(),
+  })
+}
+/** Type of "filter". */
+export type Filter = z.infer<ReturnType<typeof filterSchema>>[string]
+type Defined<T> = T extends undefined ? never : T
+type FilterWithOp<F> = {
+  [K in keyof Partial<F>]: Defined<F[K]> | Partial<{
+    [O in typeof operators[number]['name']]: O extends 'in'
+    ? [NonNullable<F[K]>, ...NonNullable<F[K]>[]] : NonNullable<F[K]>
+  }>
+}
+export type FilterWithOpOr<F> = FilterWithOp<F>
+  | {OR: [FilterWithOp<F>, ...FilterWithOp<F>[]]} | null | undefined
+
+// Zod schema for the "list" response
+export const listSchema = (schema: ZodTypeAny) => {
   return z.tuple([schema.array(), z.number().int().nonnegative()])
 }
+/** Type of the "list" response. */
+export type ListRes = z.infer<ReturnType<typeof listSchema>>

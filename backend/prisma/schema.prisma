@@ -23,36 +23,67 @@ datasource db {
 }
 
 model User {
+  /// @zod.coerce
   id          Int       @id @default(autoincrement())
   /// @zod.coerce
-  created_at  DateTime  @default(now())
+  createdAt   DateTime  @default(now())
   /// @zod.coerce
-  updated_at  DateTime?
-  /// @zod.min(imports.default.USERNAME_MIN).max(imports.default.USERNAME_MAX).regex(/^[a-zA-Z][a-zA-Z0-9_]*$/, {message: imports.MESSAGE.INV_USERNAME})
+  updatedAt   DateTime?
+  /// @zod.min(imports.default.NAME_MIN).max(imports.default.NAME_MAX).regex(/^[a-zA-Z][a-zA-Z0-9_]*$/, {message: imports.MESSAGE.INV_NAME})
   username    String    @unique
-  /// @zod.max(imports.default.NAME_MAX).regex(/^[a-zA-Z\s-]*$/, {message: imports.MESSAGE.INV_NAME})
-  name        String?
-  /// @zod.email()
-  email       String?
-  /// @zod.min(imports.default.PASSWD_MIN).max(imports.default.PASSWD_MAX).regex(/[A-Za-z]/, {message: imports.MESSAGE.INV_PASSWD_LETTER_REQUIRED}).regex(/[0-9]/, {message: imports.MESSAGE.INV_PASSWD_NUM_REQUIRED})
+  /// @zod.min(imports.default.PASSWD_MIN).max(imports.default.PASSWD_MAX).regex(/[A-Za-z]/, {message: imports.MESSAGE.INV_PASSWD_LETTER_REQUIRED}).regex(/[0-9]/, {message: imports.MESSAGE.INV_PASSWD_DIGIT_REQUIRED})
   password    String
+  /// @zod.email()
+  email       String    @unique
+  // inverse side of 1:1 (must be optional)
+  profile     Profile?
+  // m:n
+  roles       Role[]
+  // 1:m
   items       Item[]
 }
 
+model Profile {
+  /// @zod.coerce
+  id          Int       @id @default(autoincrement())
+  /// @zod.coerce
+  createdAt   DateTime  @default(now())
+  /// @zod.coerce
+  updatedAt   DateTime?
+  /// @zod.min(1).max(imports.default.DISPLAYED_NAME_MAX)
+  name        String
+  // owning side of 1:1 (unique)
+  username    String    @unique
+  user        User      @relation(fields: [username], references: [username], onDelete: Cascade)
+}
+
+model Role {
+  /// @zod.coerce
+  id          Int       @id @default(autoincrement())
+  /// @zod.coerce
+  createdAt   DateTime  @default(now())
+  /// @zod.coerce
+  updatedAt   DateTime?
+  /// @zod.custom(z.enum(imports.default.ROLES))
+  name        String    @unique
+  // m:n
+  users       User[]
+}
+
 model Item {
-  id          Int           @id @default(autoincrement())
   /// @zod.coerce
-  created_at  DateTime      @default(now())
+  id          Int       @id @default(autoincrement())
   /// @zod.coerce
-  updated_at  DateTime?
-  /// @zod.min(1).max(imports.default.NAME_MAX)
-  name        String        @unique
-  /// @zod.custom(z.enum(["BOOK", "ELECTRONICS", "MISC"]))
-  category    String
-  /// @zod.nonnegative()
-  price       Decimal       @db.Decimal(10, 2)
-  /// @zod.nonnegative()
-  stock       Int
-  user_id     Int?
-  user  User? @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  createdAt   DateTime  @default(now())
+  /// @zod.coerce
+  updatedAt   DateTime?
+  /// @zod.min(imports.default.NAME_MIN).max(imports.default.NAME_MAX).regex(/^[a-zA-Z][a-zA-Z0-9_]*$/, {message: imports.MESSAGE.INV_NAME})
+  name        String
+  /// @zod.coerce.nonnegative()
+  price       Decimal   @db.Decimal(10, 2)
+  // m:1
+  username    String
+  user        User      @relation(fields: [username], references: [username], onDelete: Cascade)
+
+  @@unique([username, name])
 }

@@ -7,6 +7,9 @@
   "description": "",
   "scripts": {
     "migrate": "pnpm --filter backend migrate",
+    "migrate:patch": "pnpm --filter backend migrate:patch",
+    "migrate:reset": "pnpm --filter backend migrate:reset",
+    "seed": "pnpm --filter backend seed",
     "copy-dist": "pnpm dlx rimraf backend/dist && pnpm dlx cpx \"frontend/dist/**/*\" backend/dist",
     "build": "pnpm -r build && pnpm copy-dist",
     "start": "pnpm --filter backend start",

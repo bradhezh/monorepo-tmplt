@@ -3,19 +3,16 @@ import {z} from 'zod'
 import {MESSAGE} from '@/const'
 import {Prisma} from '@PrismaClient/.'
 import {
-  ItemIncs, ItemPage, ItemFilter, ItemData, ItemDataOpt, ItemRes,
+  ProfIncs, ProfPage, ProfFilter, ProfData, ProfDataOpt, ProfRes, ProfListRes,
   UserFilter, UserKey,
 } from '@shared/schemas'
 import {parseIncs, parsePage} from '@/services/base'
 import {prisma} from '@/app'
 
-type ItemResPrisma = Omit<ItemRes, 'price'> & {price: Prisma.Decimal}
-type ItemListResPrisma = [ItemResPrisma[], number]
-
 export const search = async (
-  filter?: NonNullable<ItemFilter>, userFltr?: NonNullable<UserFilter>,
-): Promise<ItemResPrisma[]> => {
-  return prisma.item.findMany({
+  filter?: NonNullable<ProfFilter>, userFltr?: NonNullable<UserFilter>,
+): Promise<ProfRes[]> => {
+  return prisma.profile.findMany({
     where: {
       ...(filter ?? {}),
       ...(userFltr === undefined ? {} : {user: {is: userFltr}}),
@@ -24,52 +21,52 @@ export const search = async (
 }
 
 export const pageSearch = async (
-  page: ItemPage,
-  filter?: NonNullable<ItemFilter>, userFltr?: NonNullable<UserFilter>,
-): Promise<ItemListResPrisma> => {
+  page: ProfPage,
+  filter?: NonNullable<ProfFilter>, userFltr?: NonNullable<UserFilter>,
+): Promise<ProfListRes> => {
   const where = {
     ...(filter ?? {}),
     ...(userFltr === undefined ? {} : {user: {is: userFltr}}),
   }
   return Promise.all([
-    prisma.item.findMany({where, ...parsePage(page)}),
-    prisma.item.count({where}),
+    prisma.profile.findMany({where, ...parsePage(page)}),
+    prisma.profile.count({where}),
   ])
 }
 
 export const getUnique = async (
-  where: Prisma.ItemWhereUniqueInput, includes?: ItemIncs,
-): Promise<ItemResPrisma> => {
-  return prisma.item.findUniqueOrThrow({where, ...parseIncs(includes)})
+  where: Prisma.ProfileWhereUniqueInput, includes?: ProfIncs,
+): Promise<ProfRes> => {
+  return prisma.profile.findUniqueOrThrow({where, ...parseIncs(includes)})
 }
 
 export const getUniqueSafe = async (
-  where: Prisma.ItemWhereUniqueInput, includes?: ItemIncs,
-): Promise<ItemResPrisma | null> => {
-  return prisma.item.findUnique({where, ...parseIncs(includes)})
+  where: Prisma.ProfileWhereUniqueInput, includes?: ProfIncs,
+): Promise<ProfRes | null> => {
+  return prisma.profile.findUnique({where, ...parseIncs(includes)})
 }
 
 export const create = async (
-  data: ItemData, user: NonNullable<UserKey>, includes?: ItemIncs,
-): Promise<ItemResPrisma> => {
-  return prisma.item.create({
+  data: ProfData, user: NonNullable<UserKey>, includes?: ProfIncs,
+): Promise<ProfRes> => {
+  return prisma.profile.create({
     data: {...data, user: {connect: user}},
     ...parseIncs(includes),
   })
 }
 
 export const update = async (
-  where: Prisma.ItemWhereUniqueInput, data?: NonNullable<ItemDataOpt>,
-  user?: NonNullable<UserKey>, includes?: ItemIncs,
-): Promise<ItemResPrisma> => {
+  where: Prisma.ProfileWhereUniqueInput, data?: NonNullable<ProfDataOpt>,
+  user?: NonNullable<UserKey>, includes?: ProfIncs,
+): Promise<ProfRes> => {
   if (!(data || user !== undefined)) {
     throw new z.ZodError([{
       code: z.ZodIssueCode.custom,
       message: MESSAGE.INV_UPDATE,
-      path: ['item', 'user'],
+      path: ['profile', 'user'],
     }])
   }
-  return prisma.item.update({
+  return prisma.profile.update({
     where,
     data: {
       ...(!data ? {} : data),
@@ -83,17 +80,17 @@ export const update = async (
 }
 
 export const updateBulk = async (
-  filter?: NonNullable<ItemFilter>, userFltr?: NonNullable<UserFilter>,
-  data?: NonNullable<ItemDataOpt>, user?: NonNullable<UserKey>,
+  filter?: NonNullable<ProfFilter>, userFltr?: NonNullable<UserFilter>,
+  data?: NonNullable<ProfDataOpt>, user?: NonNullable<UserKey>,
 ): Promise<Prisma.BatchPayload> => {
   if (!(data || user !== undefined)) {
     throw new z.ZodError([{
       code: z.ZodIssueCode.custom,
       message: MESSAGE.INV_UPDATE,
-      path: ['item', 'user'],
+      path: ['profile', 'user'],
     }])
   }
-  return prisma.item.updateMany({
+  return prisma.profile.updateMany({
     where: {
       ...(filter ?? {}),
       ...(userFltr === undefined ? {} : {user: {is: userFltr}}),
@@ -109,15 +106,15 @@ export const updateBulk = async (
 }
 
 export const remove = async (
-  where: Prisma.ItemWhereUniqueInput,
-): Promise<ItemResPrisma> => {
-  return prisma.item.delete({where})
+  where: Prisma.ProfileWhereUniqueInput,
+): Promise<ProfRes> => {
+  return prisma.profile.delete({where})
 }
 
 export const rmBulk = async (
-  filter?: NonNullable<ItemFilter>, userFltr?: NonNullable<UserFilter>,
+  filter?: NonNullable<ProfFilter>, userFltr?: NonNullable<UserFilter>,
 ): Promise<Prisma.BatchPayload> => {
-  return prisma.item.deleteMany({
+  return prisma.profile.deleteMany({
     where: {
       ...(filter ?? {}),
       ...(userFltr === undefined ? {} : {user: {is: userFltr}}),

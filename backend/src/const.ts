@@ -20,7 +20,17 @@ export const ERROR = {
 export const MESSAGE = {
   ...MESSAGE_COMMON,
 
-  APP_STARTED: 'Server running on port %d.',
-  UNKNOWN_EP: 'Unknown endpoint.',
+  NO_ROLES_INC: 'No roles included in the user for authorisation.',
   UNKNOWN: 'Unknown error.',
+  UNKNOWN_EP: 'Unknown endpoint.',
+  NO_TOKEN: 'No token with the request.',
+  INV_TOKEN: 'Token invalid.',
+  NO_ABILITY: 'No ability or user for permission check.',
+  INV_PERM: 'Invalid permission for the operation.',
+  INV_UPDATE: 'Update without any data specified.',
+  INV_NULL: 'Invalid null.',
+  INV_UNDEFINED: 'Invalid undefined.',
+  REQUIRED: 'Invalid null or undefined.',
+  INV_CREDENTIAL: 'Username or password incorrect.',
+  APP_STARTED: 'Server running on port %d.',
 } as const

@@ -1,13 +1,13 @@
 import {format} from 'util'
-import {LogType} from '@PrismaClient/log'
 
-import {ENV} from '@shared/const'
+import {ENV} from '@/const'
 import conf from '@/conf'
+import {LogType} from '@PrismaClient/log'
 import {PrismaClientLogEx} from '@/app'
 
 const DI: {prisma?: PrismaClientLogEx} = {}
 
-export const init = ({prisma}: {prisma: PrismaClientLogEx}) => {
+export const init = (prisma: PrismaClientLogEx) => {
   DI.prisma = prisma
 }
 

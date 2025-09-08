@@ -6,9 +6,12 @@ export const ENV = {
 } as const
 
 export const MESSAGE = {
-  INV_USERNAME: 'Username must start with a letter and contain only letters, numbers, or underscores.',
-  INV_NAME: 'Name may contain only letters, spaces, and hyphens.',
+  INV_NAME: 'Name as a key must start with a letter and contain only letters, numbers, or underscores.',
   INV_PASSWD_LETTER_REQUIRED: 'Password must include letters.',
-  INV_PASSWD_NUM_REQUIRED: 'Password must include numbers.',
+  INV_PASSWD_DIGIT_REQUIRED: 'Password must include digits.',
+  NON_UNDEFINED: 'Data cannot be undefined.',
+  NON_NULLISH: 'Data cannot be null or undefined.',
   INV_CONDITION: 'Condition invalid.',
+  INV_FILTER: 'No condition included.',
+  INV_DATAOPT: 'No data included.',
 } as const

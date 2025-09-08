@@ -7,8 +7,9 @@ import conf from '@/conf'
 import {PrismaClient as PrismaClientLog} from '@PrismaClient/log'
 import log from '@/utils/log'
 import {reqLogger, unknownEp, errHandler} from '@/utils/middleware'
-import {omit} from '@shared/schemas'
 import {PrismaClient} from '@PrismaClient/.'
+import {omit} from '@shared/schemas'
+import loginRouter from '@/controllers/login'
 import usersRouter from '@/controllers/users'
 import itemsRouter from '@/controllers/items'
 
@@ -16,7 +17,7 @@ export const prisma = new PrismaClient({omit}).$extends(withAccelerate())
 export const prismaLog = conf.NODE_ENV !== ENV.DBG
   ? null : new PrismaClientLog().$extends(withAccelerate())
 export type PrismaClientLogEx = typeof prismaLog
-log.init({prisma: prismaLog})
+log.init(prismaLog)
 
 export const app = express()
 
@@ -43,7 +44,8 @@ app.get(conf.VER_EP, (_req, res) => {
   res.json(conf.VERSION)
 })
 
-app.use(conf.ITEMS_EP, itemsRouter)
+app.use(conf.LOGIN_EP, loginRouter)
 app.use(conf.USERS_EP, usersRouter)
+app.use(conf.ITEMS_EP, itemsRouter)
 app.use(unknownEp)
 app.use(errHandler)

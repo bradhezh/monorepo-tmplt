@@ -1,12 +1,14 @@
 import {Request, Response, NextFunction} from 'express'
+import jwt from 'jsonwebtoken'
 import {z} from 'zod'
 import path from 'path'
 import {format} from 'util'
 
-import {ENV} from '@shared/const'
-import {HTTP_STATUS, HttpStatus, ERROR, MESSAGE} from '@/const'
+import {ENV, HTTP_STATUS, HttpStatus, ERROR, MESSAGE} from '@/const'
 import conf from '@/conf'
 import log from '@/utils/log'
+import usersSvc from '@/services/users'
+import ability from '@/utils/ability'
 
 export class MiddlewareErr extends Error {
   name = ERROR.MIDDLEWARE
@@ -64,4 +66,20 @@ export const errHandler = (
 
   // pass to the default one
   next(err)
+}
+
+export const auth = async (
+  req: Request, _res: Response, next: NextFunction,
+) => {
+  const token = req.get('authorization')?.replace('Bearer ', '')
+  if (!token) {
+    throw new MiddlewareErr(HTTP_STATUS.UNAUTHED, MESSAGE.NO_TOKEN)
+  }
+  const id = Number((jwt.verify(token, conf.SECRET) as {id: number}).id)
+  if (isNaN(id)) {
+    throw new MiddlewareErr(HTTP_STATUS.UNAUTHED, MESSAGE.INV_TOKEN)
+  }
+  req.user = await usersSvc.getUnique({id}, ['roles'])
+  req.ability = ability(req.user)
+  next()
 }

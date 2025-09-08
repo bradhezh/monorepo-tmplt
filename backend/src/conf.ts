@@ -26,12 +26,33 @@ const conf = {
   INI_ADMIN: process.env.INI_ADMIN || 'admin',
   /** Flexible or sensitive configuration included in .env: should be set in the
     cloud but unnecessary in CICD pipelines. */
-  INI_ADMIN_PASSWD: process.env.INI_ADMIN_PASSWD || '888888',
+  DEF_PASSWD: process.env.DEF_PASSWD || '888888',
+  /** Flexible or sensitive configuration included in .env: should be set in the
+    cloud but unnecessary in CICD pipelines. */
+  TOKEN_EXPIRE: Number(process.env.TOKEN_EXPIRE) || 604800,
 
   VER_EP: '/version',
   VERSION: 0,
 
   DIST_DIR: 'dist',
+
+  PERM: {
+    ACTION: {
+      READ: 'read',
+      CREATE: 'create',
+      UPDATE: 'update',
+      DELETE: 'delete',
+      RESET_PASSWD: 'resetPassword',
+      SET_ROLE: 'setRole',
+    },
+    SUBJECT: {
+      USER: 'user',
+      PROFILE: 'profile',
+      ROLE: 'role',
+      ITEM: 'item',
+      USER_ROLE: 'user_role',
+    },
+  },
 } as const
 
 /** Flexible or sensitive configurations are typically from corresponding

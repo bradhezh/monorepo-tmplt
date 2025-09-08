@@ -1,18 +1,21 @@
 export * from './base'
 export * from './User'
+export * from './Profile'
+export * from './Role'
 export * from './Item'
 
-import {userExcludes, userOrderBy} from './User'
-import {itemExcludes, itemOrderBy} from './Item'
+import {userOmit} from './User'
+import {profOmit} from './Profile'
+import {roleOmit} from './Role'
+import {itemOmit} from './Item'
 
 export const omit = {
-  ...(!userExcludes.length
-    ? {} : {user: Object.fromEntries(userExcludes.map(e => [e, true]))}),
-  ...(!itemExcludes.length
-    ? {} : {item: Object.fromEntries(itemExcludes.map(e => [e, true]))}),
-} as const
-
-export const orderByDefs = {
-  user: userOrderBy,
-  item: itemOrderBy,
+  ...(!Object.keys(userOmit).length
+    ? {} : {user: userOmit}),
+  ...(!Object.keys(profOmit).length
+    ? {} : {profile: profOmit}),
+  ...(!Object.keys(roleOmit).length
+    ? {} : {role: roleOmit}),
+  ...(!Object.keys(itemOmit).length
+    ? {} : {item: itemOmit}),
 } as const
