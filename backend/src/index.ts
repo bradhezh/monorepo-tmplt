@@ -10,6 +10,6 @@ process.on('SIGINT', async () => {
   process.exit(0)
 })
 
-app.listen(conf.PORT, () => {
-  log.info(MESSAGE.APP_STARTED, conf.PORT).catch(console.log)
+app.listen(conf.PORT, async () => {
+  await log.info(MESSAGE.APP_STARTED, conf.PORT)
 })

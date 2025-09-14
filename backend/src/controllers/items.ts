@@ -113,7 +113,7 @@ export const getByUsername = async (req: Request, res: Response) => {
 export const create = async (req: Request, res: Response) => {
   const {item: data} = itemSchemaData.parse(req.body)
   const {includes} = itemSchemaIncs.parse(req.body) as {includes?: ItemIncs}
-  if (!(req.ability && req.user)) {
+  if (!req.ability || !req.user) {
     throw new Error(MESSAGE.NO_ABILITY)
   }
   if (!req.ability.can(conf.PERM.ACTION.CREATE, conf.PERM.SUBJECT.ITEM)) {
@@ -165,11 +165,12 @@ export const remove = async (req: Request, res: Response) => {
     throw new MiddlewareErr(HTTP_STATUS.UNAUTHED, MESSAGE.INV_PERM)
   }
   await itemsSvc.remove(id)
-  res.status(HTTP_STATUS.NO_CONTENT)
+  res.status(HTTP_STATUS.NO_CONTENT).end()
 }
 
 /** `DELETE /api/items
   {items?: NonNullable<ItemFilter>} & {users?: NonNullable<UserFilter>}`<br>
+  => `number`<br>
   Authorization header required with the `ITEM DELETE` (with `users`) or `ITEM
   DELETE {username: user.username}` (without `users`, meaning my items)
   permission. */
@@ -190,7 +191,7 @@ export const rmBulk = async (req: Request, res: Response) => {
       path: ['users'],
     }])
   }
-  if (!(req.ability && req.user)) {
+  if (!req.ability || !req.user) {
     throw new Error(MESSAGE.NO_ABILITY)
   }
   if (userFltr
@@ -200,8 +201,9 @@ export const rmBulk = async (req: Request, res: Response) => {
       subject(conf.PERM.SUBJECT.ITEM, {username: req.user.username}))) {
     throw new MiddlewareErr(HTTP_STATUS.UNAUTHED, MESSAGE.INV_PERM)
   }
-  await itemsSvc.rmBulk(filter, userFltr ?? {username: req.user.username})
-  res.status(HTTP_STATUS.NO_CONTENT)
+  const ret =
+    await itemsSvc.rmBulk(filter, userFltr ?? {username: req.user.username})
+  res.json(ret.count)
 }
 
 itemsRouter.get('/', getAll)

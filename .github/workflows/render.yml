@@ -36,9 +36,9 @@ jobs:
       - name: Test
         # flexible or sensitive for testing, as env vars in the pipeline
         env:
-          DATABASE_URL: ${{ secrets.DB_URL_TEST }}
-          DB_URL_LOG: ${{ secrets.DB_URL_LOG_TEST }}
-          DB_URL_LOG_DIRECT: ${{ secrets.DB_URL_LOG_DIRECT_TEST }}
+          DATABASE_URL: ${{ secrets.DB_URL }}
+          DB_URL_LOG: ${{ secrets.DB_URL_LOG }}
+          DB_URL_LOG_DIRECT: ${{ secrets.DB_URL_LOG_DIRECT }}
         run: pnpm test
       - name: Trigger Deployment on Render
         #if: false

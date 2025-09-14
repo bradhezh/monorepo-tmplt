@@ -66,7 +66,7 @@ export const update = async (
   where: Prisma.RoleWhereUniqueInput,
   data?: NonNullable<RoleDataOpt>, users?: UserKeys, includes?: RoleIncs,
 ): Promise<RoleResPrisma> => {
-  if (!(data || users !== undefined)) {
+  if (!data && users === undefined) {
     throw new z.ZodError([{
       code: z.ZodIssueCode.custom,
       message: MESSAGE.INV_UPDATE,
@@ -88,7 +88,7 @@ export const updateBulk = async (
   filter?: NonNullable<RoleFilter>, userFltr?: UserFilter,
   data?: NonNullable<RoleDataOpt>, users?: UserKeys,
 ): Promise<Prisma.BatchPayload> => {
-  if (!(data || users !== undefined)) {
+  if (!data && users === undefined) {
     throw new z.ZodError([{
       code: z.ZodIssueCode.custom,
       message: MESSAGE.INV_UPDATE,

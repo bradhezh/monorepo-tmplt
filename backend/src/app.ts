@@ -5,7 +5,6 @@ import {withAccelerate} from '@prisma/extension-accelerate'
 import {ENV} from '@/const'
 import conf from '@/conf'
 import {PrismaClient as PrismaClientLog} from '@PrismaClient/log'
-import log from '@/utils/log'
 import {reqLogger, unknownEp, errHandler} from '@/utils/middleware'
 import {PrismaClient} from '@PrismaClient/.'
 import {omit} from '@shared/schemas'
@@ -14,10 +13,8 @@ import usersRouter from '@/controllers/users'
 import itemsRouter from '@/controllers/items'
 
 export const prisma = new PrismaClient({omit}).$extends(withAccelerate())
-export const prismaLog = conf.NODE_ENV !== ENV.DBG
+export const prismaLog = conf.NODE_ENV !== ENV.DBG && conf.NODE_ENV !== ENV.TEST
   ? null : new PrismaClientLog().$extends(withAccelerate())
-export type PrismaClientLogEx = typeof prismaLog
-log.init(prismaLog)
 
 export const app = express()
 

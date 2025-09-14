@@ -62,10 +62,11 @@ export const getUniqueSafe = async (
 export const create = async (
   data: UserData, profile?: ProfData, roles?: RoleKeys, includes?: UserIncs,
 ): Promise<UserRes> => {
-  data.password = await bcrypt.hash(data.password, conf.SALT)
+  const password = await bcrypt.hash(data.password, conf.SALT)
   return prisma.user.create({
     data: {
       ...data,
+      password,
       ...(!profile ? {} : {profile: {create: profile}}),
       ...(!roles ? {} : {roles: {connect: roles}}),
     },
@@ -77,7 +78,7 @@ export const update = async (
   where: Prisma.UserWhereUniqueInput, data?: NonNullable<UserDataOpt>,
   profile?: ProfData | ProfDataOpt, roles?: RoleKeys, includes?: UserIncs,
 ): Promise<UserRes> => {
-  if (!(data || profile !== undefined || roles !== undefined)) {
+  if (!data && profile === undefined && roles === undefined) {
     throw new z.ZodError([{
       code: z.ZodIssueCode.custom,
       message: MESSAGE.INV_UPDATE,
@@ -121,7 +122,7 @@ export const updateBulk = async (
   profFltr?: ProfFilter, roleFltr?: RoleFilter, itemFltr?: ItemFilter,
   data?: NonNullable<UserDataOpt>, roles?: RoleKeys,
 ): Promise<Prisma.BatchPayload> => {
-  if (!(data || roles !== undefined)) {
+  if (!data && roles === undefined) {
     throw new z.ZodError([{
       code: z.ZodIssueCode.custom,
       message: MESSAGE.INV_UPDATE,

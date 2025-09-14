@@ -224,7 +224,7 @@ export const setMyPasswd = async (req: Request, res: Response) => {
   if (!await usersSvc.setPasswd({id: req.user.id}, password)) {
     throw new MiddlewareErr(HTTP_STATUS.UNAUTHED, MESSAGE.INV_CREDENTIAL)
   }
-  res.status(HTTP_STATUS.NO_CONTENT)
+  res.status(HTTP_STATUS.NO_CONTENT).end()
 }
 
 /** `PATCH /api/users/:id/password`<br>
@@ -238,7 +238,7 @@ export const setPasswd = async (req: Request, res: Response) => {
     throw new MiddlewareErr(HTTP_STATUS.UNAUTHED, MESSAGE.INV_PERM)
   }
   await usersSvc.setPasswd(id, conf.DEF_PASSWD)
-  res.status(HTTP_STATUS.NO_CONTENT)
+  res.status(HTTP_STATUS.NO_CONTENT).end()
 }
 
 /** `POST /api/users/:id/roles
@@ -297,7 +297,7 @@ export const removeMe = async (req: Request, res: Response) => {
     throw new Error(MESSAGE.NO_ABILITY)
   }
   await usersSvc.remove({id: req.user.id})
-  res.status(HTTP_STATUS.NO_CONTENT)
+  res.status(HTTP_STATUS.NO_CONTENT).end()
 }
 
 /** `DELETE /api/users/:id`<br>
@@ -311,11 +311,12 @@ export const remove = async (req: Request, res: Response) => {
     throw new MiddlewareErr(HTTP_STATUS.UNAUTHED, MESSAGE.INV_PERM)
   }
   await usersSvc.remove(id)
-  res.status(HTTP_STATUS.NO_CONTENT)
+  res.status(HTTP_STATUS.NO_CONTENT).end()
 }
 
 /** `DELETE /api/users {users?: NonNullable<UserFilter>}
   & {profiles?: ProfFilter} & {roles?: RoleFilter} & {items?: ItemFilter}`<br>
+  => `number`<br>
   Authorization header required with the `USER DELETE` permission. */
 export const rmBulk = async (req: Request, res: Response) => {
   const {users: filter} = userSchemaFilter.parse(req.body)
@@ -335,8 +336,8 @@ export const rmBulk = async (req: Request, res: Response) => {
   if (!req.ability.can(conf.PERM.ACTION.DELETE, conf.PERM.SUBJECT.USER)) {
     throw new MiddlewareErr(HTTP_STATUS.UNAUTHED, MESSAGE.INV_PERM)
   }
-  await usersSvc.rmBulk(filter, profFltr, roleFltr, itemFltr)
-  res.status(HTTP_STATUS.NO_CONTENT)
+  const ret = await usersSvc.rmBulk(filter, profFltr, roleFltr, itemFltr)
+  res.json(ret.count)
 }
 
 usersRouter.get('/', auth, getAll)

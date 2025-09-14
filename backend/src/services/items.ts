@@ -3,73 +3,76 @@ import {z} from 'zod'
 import {MESSAGE} from '@/const'
 import {Prisma} from '@PrismaClient/.'
 import {
-  ItemIncs, ItemPage, ItemFilter, ItemData, ItemDataOpt, ItemRes,
+  ItemIncs, ItemPage, ItemFilter, ItemData, ItemDataOpt, ItemRes, ItemListRes,
   UserFilter, UserKey,
 } from '@shared/schemas'
 import {parseIncs, parsePage} from '@/services/base'
 import {prisma} from '@/app'
 
-type ItemResPrisma = Omit<ItemRes, 'price'> & {price: Prisma.Decimal}
-type ItemListResPrisma = [ItemResPrisma[], number]
-
 export const search = async (
   filter?: NonNullable<ItemFilter>, userFltr?: NonNullable<UserFilter>,
-): Promise<ItemResPrisma[]> => {
-  return prisma.item.findMany({
+): Promise<ItemRes[]> => {
+  const items = await prisma.item.findMany({
     where: {
       ...(filter ?? {}),
       ...(userFltr === undefined ? {} : {user: {is: userFltr}}),
     },
   })
+  return items.map(e => ({...e, price: Number(e.price)}))
 }
 
 export const pageSearch = async (
   page: ItemPage,
   filter?: NonNullable<ItemFilter>, userFltr?: NonNullable<UserFilter>,
-): Promise<ItemListResPrisma> => {
+): Promise<ItemListRes> => {
   const where = {
     ...(filter ?? {}),
     ...(userFltr === undefined ? {} : {user: {is: userFltr}}),
   }
-  return Promise.all([
+  const list = await Promise.all([
     prisma.item.findMany({where, ...parsePage(page)}),
     prisma.item.count({where}),
   ])
+  return [list[0].map(e => ({...e, price: Number(e.price)})), list[1]]
 }
 
 export const getUnique = async (
   where: Prisma.ItemWhereUniqueInput, includes?: ItemIncs,
-): Promise<ItemResPrisma> => {
-  return prisma.item.findUniqueOrThrow({where, ...parseIncs(includes)})
+): Promise<ItemRes> => {
+  const item =
+    await prisma.item.findUniqueOrThrow({where, ...parseIncs(includes)})
+  return {...item, price: Number(item.price)}
 }
 
 export const getUniqueSafe = async (
   where: Prisma.ItemWhereUniqueInput, includes?: ItemIncs,
-): Promise<ItemResPrisma | null> => {
-  return prisma.item.findUnique({where, ...parseIncs(includes)})
+): Promise<ItemRes | null> => {
+  const item = await prisma.item.findUnique({where, ...parseIncs(includes)})
+  return item && {...item, price: Number(item.price)}
 }
 
 export const create = async (
   data: ItemData, user: NonNullable<UserKey>, includes?: ItemIncs,
-): Promise<ItemResPrisma> => {
-  return prisma.item.create({
+): Promise<ItemRes> => {
+  const item = await prisma.item.create({
     data: {...data, user: {connect: user}},
     ...parseIncs(includes),
   })
+  return {...item, price: Number(item.price)}
 }
 
 export const update = async (
   where: Prisma.ItemWhereUniqueInput, data?: NonNullable<ItemDataOpt>,
   user?: NonNullable<UserKey>, includes?: ItemIncs,
-): Promise<ItemResPrisma> => {
-  if (!(data || user !== undefined)) {
+): Promise<ItemRes> => {
+  if (!data && user === undefined) {
     throw new z.ZodError([{
       code: z.ZodIssueCode.custom,
       message: MESSAGE.INV_UPDATE,
       path: ['item', 'user'],
     }])
   }
-  return prisma.item.update({
+  const item = await prisma.item.update({
     where,
     data: {
       ...(!data ? {} : data),
@@ -80,13 +83,14 @@ export const update = async (
     },
     ...parseIncs(includes),
   })
+  return {...item, price: Number(item.price)}
 }
 
 export const updateBulk = async (
   filter?: NonNullable<ItemFilter>, userFltr?: NonNullable<UserFilter>,
   data?: NonNullable<ItemDataOpt>, user?: NonNullable<UserKey>,
 ): Promise<Prisma.BatchPayload> => {
-  if (!(data || user !== undefined)) {
+  if (!data && user === undefined) {
     throw new z.ZodError([{
       code: z.ZodIssueCode.custom,
       message: MESSAGE.INV_UPDATE,
@@ -110,8 +114,9 @@ export const updateBulk = async (
 
 export const remove = async (
   where: Prisma.ItemWhereUniqueInput,
-): Promise<ItemResPrisma> => {
-  return prisma.item.delete({where})
+): Promise<ItemRes> => {
+  const item = await prisma.item.delete({where})
+  return {...item, price: Number(item.price)}
 }
 
 export const rmBulk = async (

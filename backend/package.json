@@ -3,10 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "migrate:patch": "pnpm prisma db execute --file prisma/patch.sql --schema prisma/schema.prisma",
     "migrate:reset": "pnpm prisma migrate reset",
+    "migrate:patch": "pnpm prisma db execute --file prisma/patch.sql --schema prisma/schema.prisma",
     "migrate": "pnpm prisma migrate reset --skip-generate --skip-seed && pnpm prisma migrate dev && pnpm migrate:patch && pnpm prisma generate --no-engine --schema prisma/log.prisma && pnpm prisma db push --skip-generate --schema prisma/log.prisma && pnpm prisma db seed",
-    "seed": "pnpm prisma db seed",
     "build": "pnpm prisma generate --no-engine && pnpm prisma generate --no-engine --schema prisma/log.prisma && tsc && tsup src/index.ts --out-dir build",
     "start": "pnpm prisma migrate deploy && pnpm migrate:patch && pnpm prisma db seed && NODE_ENV=production node build/index.js",
     "start:debug": "pnpm prisma migrate deploy && pnpm migrate:patch && pnpm prisma db push --skip-generate --schema prisma/log.prisma && pnpm prisma db seed && NODE_ENV=debug node build/index.js",

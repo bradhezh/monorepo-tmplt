@@ -21,16 +21,19 @@ export class MiddlewareErr extends Error {
 }
 
 /** Log requests before they're handled, only for "debug" or development. */
-export const reqLogger = (req: Request, _res: Response, next: NextFunction) => {
-  log.debug(req.method, req.path).catch(console.log)
-  if (conf.NODE_ENV === ENV.DEV) {
-    log.debug(req.body).catch(console.log)
-  }
+export const reqLogger = async (
+  req: Request, _res: Response, next: NextFunction,
+) => {
+  await log.debug(req.method, req.path,
+    conf.NODE_ENV !== ENV.DEV && conf.NODE_ENV !== ENV.TEST ? undefined
+      : req.body)
   next()
 }
 
-export const unknownEp = (_req: Request, res: Response, next: NextFunction) => {
-  log.debug(MESSAGE.UNKNOWN_EP).catch(console.log)
+export const unknownEp = async (
+  _req: Request, res: Response, next: NextFunction,
+) => {
+  await log.debug(MESSAGE.UNKNOWN_EP)
   if (!conf.SPA) {
     throw new MiddlewareErr(HTTP_STATUS.NOT_FOUND, MESSAGE.UNKNOWN_EP)
   }
@@ -39,14 +42,14 @@ export const unknownEp = (_req: Request, res: Response, next: NextFunction) => {
   res.sendFile(path.join(process.cwd(), conf.SPA), next)
 }
 
-export const errHandler = (
+export const errHandler = async (
   err: unknown, _req: Request, res: Response, next: NextFunction,
 ) => {
   // type narrowing
   if (!(err instanceof Error)) {
     throw new Error(MESSAGE.UNKNOWN)
   }
-  log.error(err.name, err.message).catch(console.log)
+  await log.error(err.name, err.message)
 
   if (err instanceof z.ZodError) {
     // causing frontend axios to throw `error` including the object from json as

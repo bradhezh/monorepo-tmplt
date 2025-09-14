@@ -59,7 +59,7 @@ export const update = async (
   where: Prisma.ProfileWhereUniqueInput, data?: NonNullable<ProfDataOpt>,
   user?: NonNullable<UserKey>, includes?: ProfIncs,
 ): Promise<ProfRes> => {
-  if (!(data || user !== undefined)) {
+  if (!data && user === undefined) {
     throw new z.ZodError([{
       code: z.ZodIssueCode.custom,
       message: MESSAGE.INV_UPDATE,
@@ -83,7 +83,7 @@ export const updateBulk = async (
   filter?: NonNullable<ProfFilter>, userFltr?: NonNullable<UserFilter>,
   data?: NonNullable<ProfDataOpt>, user?: NonNullable<UserKey>,
 ): Promise<Prisma.BatchPayload> => {
-  if (!(data || user !== undefined)) {
+  if (!data && user === undefined) {
     throw new z.ZodError([{
       code: z.ZodIssueCode.custom,
       message: MESSAGE.INV_UPDATE,
