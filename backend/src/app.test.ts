@@ -72,7 +72,7 @@ describe('app', () => {
     await usersSvc.create(admin, undefined, [{name: conf.ROLE.ADMIN}])
 
     await log.info('Test start...')
-  }, 20000)
+  })
 
   describe('users', () => {
     it('signup', async () => {
