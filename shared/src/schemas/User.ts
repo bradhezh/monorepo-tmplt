@@ -10,8 +10,8 @@ import {userSchema} from '@shared/schemas/prisma'
 const autos = ['id', 'createdAt', 'updatedAt'] as const
 const excludes = ['password'] as const
 const fkeys = [] as const
-// response of relations possibly included; note that for to-many relationships,
-// the count of included one should be controllable since no pagination for it
+// response of relations possibly included; note that for :m relationships, the
+// count of included one should be controllable since no pagination for it
 const relsRes = () => ({
   profile: profSchemaResNoRelated.nullish(),
   roles: roleSchemaResNoRelated.array().optional(),

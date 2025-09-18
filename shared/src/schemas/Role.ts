@@ -9,8 +9,8 @@ import {roleSchema} from '@shared/schemas/prisma'
 const autos = ['id', 'createdAt', 'updatedAt'] as const
 const excludes = [] as const
 const fkeys = [] as const
-// response of relations possibly included; note that for to-many relationships,
-// the count of included one should be controllable since no pagination for it
+// response of relations possibly included; note that for :m relationships, the
+// count of included one should be controllable since no pagination for it
 const relsRes = () => ({} as const)
 const resRels = [] as string[]
 

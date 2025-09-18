@@ -10,8 +10,8 @@ import {itemSchema} from '@shared/schemas/prisma'
 const autos = ['id', 'createdAt', 'updatedAt'] as const
 const excludes = [] as const
 const fkeys = ['username'] as const
-// response of relations possibly included; note that for to-many relationships,
-// the count of included one should be controllable since no pagination for it
+// response of relations possibly included; note that for :m relationships, the
+// count of included one should be controllable since no pagination for it
 const relsRes = () => ({user: userSchemaResNoRelated.optional()} as const)
 const resRels = ['user']
 
@@ -74,6 +74,7 @@ export const itemSchemaData = z.object({
 /** Type of item's "data", typically for creation. */
 export type ItemData = z.infer<typeof itemSchemaData>['item']
 
+// todo: add ops like "increment" and "decrement" in the similar way as "filter"
 /** Zod schema for item's "partial data", typically for updating. */
 export const itemSchemaDataOpt = z.object({
   item: itemSchemaData.shape.item.omit(itemOmit).partial()
